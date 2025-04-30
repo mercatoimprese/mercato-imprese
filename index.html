@@ -1,1 +1,113 @@
-<!-- index.html placeholder -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mercato Imprese</title>
+  <link rel="icon" href="logo.png">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; }
+    header { background: linear-gradient(to right, #004080, #007acc); color: white; text-align: center; padding: 30px; }
+    header img { max-width: 320px; width: 90%; margin-bottom: 10px; }
+    nav a { color: white; margin: 0 10px; font-weight: bold; text-decoration: none; }
+    .container { max-width: 900px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 8px; }
+    .azienda { background: #eef6ff; margin-bottom: 10px; padding: 10px; border-left: 4px solid #007acc; border-radius: 6px; }
+    .azienda img { max-width: 150px; margin-bottom: 10px; display: block; }
+    .admin-box { background: #fff9e6; padding: 15px; border-radius: 8px; }
+    input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid #ccc; }
+    button { background: #007acc; color: white; cursor: pointer; }
+    footer { text-align: center; background: #222; color: white; padding: 15px; margin-top: 40px; }
+  </style>
+  <script>
+    let admin = false;
+    function showSection(id) {
+      ['home', 'aziende', 'contatti', 'admin'].forEach(sec => {
+        document.getElementById(sec).style.display = 'none';
+      });
+      document.getElementById(id).style.display = 'block';
+    }
+    function loginAdmin() {
+      const user = document.getElementById("user").value;
+      const pass = document.getElementById("pass").value;
+      if (user === "admin" && pass === "admin123") {
+        admin = true;
+        document.getElementById("admin-panel").style.display = "block";
+        document.querySelectorAll(".btn-elimina").forEach(btn => btn.style.display = "inline-block");
+        alert("Accesso effettuato");
+      } else {
+        alert("Credenziali errate");
+      }
+    }
+    function aggiungiAzienda() {
+      const nome = document.getElementById("nome").value;
+      const prezzo = document.getElementById("prezzo").value;
+      const file = document.getElementById("file").files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const div = document.createElement("div");
+        div.className = "azienda";
+        let contenuto = "";
+        if (file && file.type.startsWith("image/")) {
+          contenuto += `<img src="${e.target.result}" alt="">`;
+        } else {
+          contenuto += `<a href="${e.target.result}" target="_blank">Visualizza PDF</a><br>`;
+        }
+        contenuto += `<strong>${nome}</strong> - €${prezzo}`;
+        if (admin) contenuto += ` <button class="btn-elimina" onclick="this.parentNode.remove()">Elimina</button>`;
+        div.innerHTML = contenuto;
+        document.getElementById("aziende-lista").appendChild(div);
+      };
+      if (file) reader.readAsDataURL(file);
+    }
+    window.onload = () => showSection('home');
+  </script>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Logo Mercato Imprese">
+    <nav>
+      <a href="#" onclick="showSection('home')">Home</a>
+      <a href="#" onclick="showSection('aziende')">Aziende</a>
+      <a href="#" onclick="showSection('contatti')">Contatti</a>
+      <a href="#" onclick="showSection('admin')">Admin</a>
+    </nav>
+  </header>
+
+  <div class="container" id="home">
+    <h2>Benvenuto su Mercato Imprese</h2>
+    <p>Scopri aziende in vendita o pubblica la tua. Servizio professionale e veloce.</p>
+  </div>
+
+  <div class="container" id="aziende" style="display:none;">
+    <h2>Aziende in Vendita</h2>
+    <div id="aziende-lista"></div>
+  </div>
+
+  <div class="container" id="contatti" style="display:none;">
+    <h2>Contattaci</h2>
+    <p>Email: <a href="mailto:mercatoimprese@gmail.com">mercatoimprese@gmail.com</a></p>
+    <p>Cellulare: <a href="tel:+393207421395">+39 320 7421395</a></p>
+  </div>
+
+  <div class="container" id="admin" style="display:none;">
+    <h2>Area Admin</h2>
+    <p><strong>Accesso riservato</strong></p>
+    <div class="admin-box">
+      <input type="text" id="user" placeholder="Username">
+      <input type="password" id="pass" placeholder="Password">
+      <button onclick="loginAdmin()">Accedi</button>
+    </div>
+    <div id="admin-panel" style="display:none;">
+      <h3>Inserisci Nuova Azienda</h3>
+      <input type="text" id="nome" placeholder="Nome azienda">
+      <input type="number" id="prezzo" placeholder="Prezzo">
+      <input type="file" id="file" accept=".jpg,.jpeg,.png,.pdf">
+      <button onclick="aggiungiAzienda()">Aggiungi</button>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Mercato Imprese - Tutti i diritti riservati
+  </footer>
+</body>
+</html>
