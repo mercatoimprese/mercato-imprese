@@ -5,184 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mercato Imprese</title>
   <link rel="icon" type="image/png" href="logo.png">
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: #f9f9f9;
-      color: #333;
-    }
-    header {
-      background: linear-gradient(to right, #004080, #007acc);
-      color: white;
-      text-align: center;
-      padding: 40px 20px;
-    }
-    header img {
-      max-width: 320px;
-      width: 80%;
-      margin-bottom: 20px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    nav a {
-      color: white;
-      margin: 0 18px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .container {
-      max-width: 960px;
-      margin: 40px auto;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-    .azienda {
-      background: #eef6ff;
-      border-left: 4px solid #007acc;
-      padding: 12px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-    }
-    .azienda img {
-      max-width: 160px;
-      display: block;
-      margin-bottom: 10px;
-    }
-    footer {
-      background: #222;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin-top: 40px;
-    }
-    .admin-box {
-      background: #fff9e6;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    input, button {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      background: #007acc;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #005fa3;
-    }
-  </style>
-  <script>
-    function showSection(section) {
-      ['home','aziende','contatti','admin'].forEach(id => {
-        document.getElementById(id).style.display = 'none';
-      });
-      document.getElementById(section).style.display = 'block';
-    }
-
-    function loginAdmin() {
-      const u = document.getElementById("user").value;
-      const p = document.getElementById("pass").value;
-      if (u === "admin" && p === "admin123") {
-        alert("Accesso riuscito");
-        document.getElementById("admin-panel").style.display = "block";
-      } else {
-        alert("Credenziali errate");
-      }
-    }
-
-    function aggiungiAzienda() {
-      const nome = document.getElementById("nome").value;
-      const prezzo = document.getElementById("prezzo").value;
-      const imgUrl = document.getElementById("immagine").value;
-      const div = document.createElement("div");
-      div.className = "azienda";
-      div.innerHTML = `<img src="${imgUrl}" alt=""><strong>${nome}</strong> - €${prezzo} <button onclick="this.parentNode.remove();salva()">Elimina</button>`;
-      document.getElementById("aziende-lista").appendChild(div);
-      salva();
-    }
-
-    function salva() {
-      const aziende = Array.from(document.querySelectorAll("#aziende-lista .azienda"))
-        .map(div => div.innerHTML);
-      localStorage.setItem("aziende", JSON.stringify(aziende));
-    }
-
-    function carica() {
-      const dati = JSON.parse(localStorage.getItem("aziende") || "[]");
-      const container = document.getElementById("aziende-lista");
-      dati.forEach(html => {
-        const div = document.createElement("div");
-        div.className = "azienda";
-        div.innerHTML = html;
-        container.appendChild(div);
-      });
-    }
-
-    window.onload = () => {
-      showSection("home");
-      carica();
-    };
-  </script>
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Logo Mercato Imprese"/>
+    <h1>Mercato Imprese</h1>
     <nav>
-      <a href="#" onclick="showSection('home')">Home</a>
-      <a href="#" onclick="showSection('aziende')">Aziende</a>
-      <a href="#" onclick="showSection('contatti')">Contatti</a>
-      <a href="#" onclick="showSection('admin')">Admin</a>
+      <a href="#">Home</a>
+      <a href="#">Aziende</a>
+      <a href="#">Contatti</a>
     </nav>
   </header>
-
-  <div class="container" id="home">
-    <h2>Benvenuto su Mercato Imprese</h2>
-    <p>La piattaforma per comprare e vendere attività con professionalità e visibilità.</p>
-  </div>
-
-  <div class="container" id="aziende" style="display:none">
-    <h2>Aziende in Vendita</h2>
-    <div id="aziende-lista"></div>
-  </div>
-
-  <div class="container" id="contatti" style="display:none">
+  <div class="container" id="contatti">
     <h2>Contattaci</h2>
-    <p>Email: info@mercatoimprese.it</p>
+    <p>Email: mercatoimprese@gmail.com</p>
   </div>
-
-  <div class="container" id="admin" style="display:none">
-    <h2>Area Admin</h2>
-    <div class="admin-box">
-      <input type="text" id="user" placeholder="Username">
-      <input type="password" id="pass" placeholder="Password">
-      <button onclick="loginAdmin()">Accedi</button>
-    </div>
-    <div id="admin-panel" style="display:none">
-      <h3>Nuova Azienda</h3>
-      <input type="text" id="nome" placeholder="Nome azienda">
-      <input type="number" id="prezzo" placeholder="Prezzo">
-      <input type="text" id="immagine" placeholder="URL immagine">
-      <button onclick="aggiungiAzienda()">Aggiungi</button>
-    </div>
-  </div>
-
-  <footer>
-    &copy; 2025 Mercato Imprese - Tutti i diritti riservati
-  </footer>
 </body>
 </html>
