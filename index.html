@@ -18,10 +18,11 @@
   </style>
   <script>
     function showSection(section) {
-      ['home','aziende','contatti','admin'].forEach(id => {
-        document.getElementById(id).style.display = 'none';
-      });
-      document.getElementById(section).style.display = 'block';
+      document.getElementById("home").style.display = "none";
+      document.getElementById("aziende").style.display = "none";
+      document.getElementById("contatti").style.display = "none";
+      document.getElementById("admin").style.display = "none";
+      document.getElementById(section).style.display = "block";
     }
 
     function loginAdmin() {
@@ -41,7 +42,7 @@
       const imgUrl = document.getElementById("immagine").value;
       const div = document.createElement("div");
       div.className = "azienda";
-      div.innerHTML = `<img src="${imgUrl}" alt="Logo azienda"><strong>${nome}</strong> - €${prezzo} <button onclick="this.parentNode.remove();salva()">Elimina</button>`;
+      div.innerHTML = `<img src="${imgUrl}" alt="Immagine"><strong>${nome}</strong> - €${prezzo} <button onclick="this.parentNode.remove();salva()">Elimina</button>`;
       document.getElementById("aziende-lista").appendChild(div);
       salva();
     }
