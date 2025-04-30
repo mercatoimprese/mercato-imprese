@@ -14,7 +14,7 @@
     .azienda { background: #eef6ff; border-left: 4px solid #007acc; margin-bottom: 10px; padding: 10px; border-radius: 5px; }
     .azienda img { max-width: 150px; margin-bottom: 5px; }
     .admin-box { background: #fff9e6; padding: 15px; border-radius: 8px; }
-    input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
+    input, button, label, select { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
     button { background: #007acc; color: white; cursor: pointer; }
     footer { background: #222; color: white; text-align: center; padding: 15px; margin-top: 40px; }
   </style>
@@ -25,25 +25,45 @@
       });
       document.getElementById(section).style.display = 'block';
     }
+
     function loginAdmin() {
       const u = document.getElementById("user").value;
       const p = document.getElementById("pass").value;
       if (u === "admin" && p === "admin123") {
-        alert("Accesso effettuato");
         document.getElementById("admin-panel").style.display = "block";
+        alert("Accesso effettuato");
       } else {
         alert("Credenziali errate");
       }
     }
+
     function aggiungiAzienda() {
       const nome = document.getElementById("nome").value;
       const prezzo = document.getElementById("prezzo").value;
-      const img = document.getElementById("immagine").value;
+      const fileInput = document.getElementById("file");
+      const file = fileInput.files[0];
       const div = document.createElement("div");
       div.className = "azienda";
-      div.innerHTML = "<img src='" + img + "' alt=''><strong>" + nome + "</strong> - €" + prezzo + " <button onclick='this.parentNode.remove()'>Elimina</button>";
-      document.getElementById("aziende-lista").appendChild(div);
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          let content = "";
+          if (file.type.startsWith("image/")) {
+            content = `<img src="${e.target.result}" alt=""><br/>`;
+          } else {
+            content = `<a href="${e.target.result}" target="_blank">Visualizza PDF</a><br/>`;
+          }
+          div.innerHTML = content + `<strong>${nome}</strong> - €${prezzo} <button onclick="this.parentNode.remove()">Elimina</button>`;
+          document.getElementById("aziende-lista").appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        div.innerHTML = `<strong>${nome}</strong> - €${prezzo} <button onclick="this.parentNode.remove()">Elimina</button>`;
+        document.getElementById("aziende-lista").appendChild(div);
+      }
     }
+
     window.onload = () => showSection('home');
   </script>
 </head>
@@ -60,7 +80,7 @@
 
   <div class="container" id="home">
     <h2>Benvenuto su Mercato Imprese</h2>
-    <p>La piattaforma per comprare e vendere attività con stile e professionalità.</p>
+    <p>La piattaforma per comprare e vendere attività in Italia.</p>
   </div>
 
   <div class="container" id="aziende" style="display:none;">
@@ -85,7 +105,7 @@
       <h3>Nuova Azienda</h3>
       <input id="nome" type="text" placeholder="Nome azienda">
       <input id="prezzo" type="number" placeholder="Prezzo">
-      <input id="immagine" type="text" placeholder="URL immagine">
+      <input id="file" type="file" accept=".jpg,.jpeg,.png,.pdf">
       <button onclick="aggiungiAzienda()">Aggiungi</button>
     </div>
   </div>
