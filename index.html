@@ -5,19 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mercato Imprese</title>
   <link rel="icon" type="image/png" href="logo.png">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; }
+    header { background: linear-gradient(to right, #004080, #007acc); color: white; text-align: center; padding: 40px 20px; }
+    header img { max-width: 340px; width: 90%; margin: auto; display: block; margin-bottom: 20px; }
+    nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+    .container { max-width: 960px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 0 8px rgba(0,0,0,0.05); }
+    footer { background: #222; color: white; text-align: center; padding: 20px; margin-top: 40px; }
+  </style>
 </head>
 <body>
   <header>
-    <h1>Mercato Imprese</h1>
+    <img src="logo.png" alt="Logo Mercato Imprese">
     <nav>
       <a href="#">Home</a>
       <a href="#">Aziende</a>
       <a href="#">Contatti</a>
+      <a href="#">Admin</a>
     </nav>
   </header>
+  <div class="container" id="home">
+    <h2>Benvenuto su Mercato Imprese</h2>
+    <p>La piattaforma per comprare e vendere aziende in Italia.</p>
+    <p>Cellulare: <a href="tel:+39 320 7421395">+39 320 7421395</a></p>
+  </div>
   <div class="container" id="contatti">
     <h2>Contattaci</h2>
-    <p>Email: mercatoimprese@gmail.com</p>
+    <p>Email: <a href="mailto:mercatoimprese@gmail.com">mercatoimprese@gmail.com</a></p>
+    <p>Cellulare: <a href="tel:+39 320 7421395">+39 320 7421395</a></p>
   </div>
+  <footer>
+    &copy; 2025 Mercato Imprese - Tutti i diritti riservati
+  </footer>
 </body>
 </html>
