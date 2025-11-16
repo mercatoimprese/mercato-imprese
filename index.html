@@ -20,7 +20,7 @@
   </style>
   <script>
     let admin = false;
-    const API = "https://script.google.com/macros/s/AKfycbw-bQW8upTP3FzYGRYEz4LeoXfXYdPYj-K_SI6f8AaobJMxgJgKfWHKQV6LZp6MfITG/exec";
+    const API = "https://script.google.com/macros/s/AKfycbzhRA2_6p768FXu7Q-dPkjjamPls2j3JJnhX-s9NXlC3oQA3AMzbfr4SLZo8r-rVBOQDw/exec";
 
     function showSection(id) {
       ['home', 'aziende', 'contatti', 'admin'].forEach(sec => {
@@ -67,7 +67,7 @@
       reader.readAsDataURL(file);
     }
 
-    function caricaAziende() {
+    function caricaAziende() {    
       fetch(API)
         .then(res => res.json())
         .then(data => {
