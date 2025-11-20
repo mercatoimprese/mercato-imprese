@@ -2,152 +2,327 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mercato Imprese</title>
-  <link rel="icon" href="logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
-    header { background: linear-gradient(to right, #004080, #007acc); color: white; padding: 30px; text-align: center; }
-    header img { max-width: 320px; width: 90%; margin-bottom: 10px; }
-    nav a { color: white; margin: 0 10px; text-decoration: none; font-weight: bold; }
-    .container { max-width: 900px; margin: 30px auto; background: #fff; padding: 20px; border-radius: 8px; }
-    .azienda { background: #eef6ff; padding: 10px; border-left: 4px solid #007acc; border-radius: 5px; margin-bottom: 10px; }
-    .azienda img { max-width: 150px; display: block; margin-bottom: 10px; }
-    .admin-box { background: #fff9e6; padding: 15px; border-radius: 8px; }
-    input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 6px; border: 1px solid #ccc; }
-    button { background: #007acc; color: white; cursor: pointer; }
-    footer { background: #222; color: white; text-align: center; padding: 15px; margin-top: 40px; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #0d1117;
+      color: #e6edf3;
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    a {
+      color: #58a6ff;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      background: #0d1117;
+      color: #e6edf3;
+    }
+
+    button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #238636;
+      background: #238636;
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #lista-aziende {
+      display: grid;
+      gap: 12px;
+    }
+
+    .azienda {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      background: #0d1117;
+    }
+
+    .azienda img {
+      max-width: 80px;
+      max-height: 80px;
+      object-fit: contain;
+      border-radius: 4px;
+      border: 1px solid #30363d;
+      background: #161b22;
+    }
+
+    .azienda-info {
+      flex: 1;
+    }
+
+    .azienda strong {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .muted {
+      color: #8b949e;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #f85149;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .success {
+      color: #3fb950;
+      margin-top: 8px;
+      font-size: 14px;
+    }
   </style>
-  <script>
-    let admin = false;
-    const API = "https://script.google.com/macros/s/AKfycbys7MS7IqU63wueVOYaZGlEyldR5bEWlNxQ_vUBdasrcJ_IscUpOUIVi1xDRl9w_MsuYg/exec";
-
-    function showSection(id) {
-      ['home', 'aziende', 'contatti', 'admin'].forEach(sec => {
-        document.getElementById(sec).style.display = 'none';
-      });
-      document.getElementById(id).style.display = 'block';
-    }
-
-    function loginAdmin() {
-      const user = document.getElementById("user").value;
-      const pass = document.getElementById("pass").value;
-      if (user === "admin" && pass === "admin123") {
-        admin = true;
-        document.getElementById("admin-panel").style.display = "block";
-        alert("Accesso effettuato");
-      } else {
-        alert("Credenziali errate");
-      }
-    }
-
-    function aggiungiAzienda() {
-      const nome = document.getElementById("nome").value;
-      const prezzo = document.getElementById("prezzo").value;
-      const file = document.getElementById("file").files[0];
-      if (!file) {
-        alert("Inserisci un file immagine o PDF");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const fileData = e.target.result;
-        fetch(API, {
-          method: "POST",
-          body: JSON.stringify({ nome, prezzo, file: fileData }),
-          headers: { "Content-Type": "application/json" }
-        }).then(res => res.text()).then(resp => {
-          alert("Azienda salvata!");
-          location.reload();
-        }).catch(err => {
-          alert("Errore nel salvataggio.");
-          console.error(err);
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-
-        function caricaAziende() {
-      fetch(API)
-        .then(res => res.json())
-        .then(data => {
-          const container = document.getElementById("aziende-lista");
-          container.innerHTML = "";
-          data.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "azienda";
-            let content = "";
-
-            if (item.mimeType && item.mimeType.startsWith("application/pdf")) {
-              // è un PDF
-              content += `<a href="${item.file}" target="_blank">Visualizza PDF</a><br>`;
-            } else if (item.file) {
-              // è una immagine
-              content += `<img src="${item.file}" alt="">`;
-            }
-
-            content += `<strong>${item.nome}</strong> - €${item.prezzo}`;
-            div.innerHTML = content;
-            container.appendChild(div);
-          });
-        })
-        .catch(err => {
-          console.error("Errore caricamento aziende", err);
-        });
-    }
-
-    window.onload = function() {
-      showSection('home');
-      caricaAziende();
-    };
-  </script>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Logo Mercato Imprese" />
-    <nav>
-      <a href="#" onclick="showSection('home')">Home</a>
-      <a href="#" onclick="showSection('aziende')">Aziende</a>
-      <a href="#" onclick="showSection('contatti')">Contatti</a>
-      <a href="#" onclick="showSection('admin')">Admin</a>
-    </nav>
-  </header>
+  <div class="container">
+    <h1>Mercato Imprese</h1>
 
-  <div class="container" id="home">
-    <h2>Benvenuto su Mercato Imprese</h2>
-    <p>Piattaforma per comprare e vendere aziende online, con salvataggio permanente su Google Sheets.</p>
-  </div>
+    <!-- FORM NUOVA AZIENDA -->
+    <div class="card">
+      <h2>Nuova azienda</h2>
+      <form id="azienda-form">
+        <label for="nome">Nome azienda</label>
+        <input type="text" id="nome" name="nome" required />
 
-  <div class="container" id="aziende" style="display:none;">
-    <h2>Aziende in Vendita</h2>
-    <div id="aziende-lista"></div>
-  </div>
+        <label for="prezzo">Prezzo</label>
+        <input type="number" id="prezzo" name="prezzo" step="0.01" min="0" required />
 
-  <div class="container" id="contatti" style="display:none;">
-    <h2>Contattaci</h2>
-    <p>Email: <a href="mailto:mercatoimprese@gmail.com">mercatoimprese@gmail.com</a></p>
-    <p>Cellulare: <a href="tel:+393207421395">+39 320 7421395</a></p>
-  </div>
+        <label for="file">File (immagine o PDF)</label>
+        <input
+          type="file"
+          id="file"
+          name="file"
+          accept="image/*,application/pdf"
+        />
 
-  <div class="container" id="admin" style="display:none;">
-    <h2>Area Admin</h2>
-    <p><strong>Accesso riservato</strong></p>
-    <div class="admin-box">
-      <input type="text" id="user" placeholder="Username" />
-      <input type="password" id="pass" placeholder="Password" />
-      <button onclick="loginAdmin()">Accedi</button>
+        <button type="submit">Salva azienda</button>
+        <div id="form-messaggi"></div>
+      </form>
     </div>
-    <div id="admin-panel" style="display:none;">
-      <h3>Nuova Azienda</h3>
-      <input type="text" id="nome" placeholder="Nome azienda" />
-      <input type="number" id="prezzo" placeholder="Prezzo" />
-      <input type="file" id="file" accept=".jpg,.jpeg,.png,.pdf" />
-      <button onclick="aggiungiAzienda()">Aggiungi</button>
+
+    <!-- LISTA AZIENDE -->
+    <div class="card">
+      <h2>Elenco aziende</h2>
+      <div id="lista-aziende" class="muted">Caricamento in corso...</div>
     </div>
   </div>
 
-  <footer>
-    &copy; 2025 Mercato Imprese - Tutti i diritti riservati
-  </footer>
+  <script>
+    // ✅ URL reale della tua API Google Apps Script
+    const API = "https://script.google.com/macros/s/AKfycbys7MS7IqU63wueVOYaZGlEyldR5bEWlNxQ_vUBdasrcJ_IscUpOUIVi1xDRl9w_MsuYg/exec";
+
+    let fileBase64 = null;
+    let fileMimeType = null;
+
+    const fileInput = document.getElementById("file");
+    const form = document.getElementById("azienda-form");
+    const formMessaggi = document.getElementById("form-messaggi");
+    const listaAziende = document.getElementById("lista-aziende");
+
+    // Legge il file selezionato come base64
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) {
+        fileBase64 = null;
+        fileMimeType = null;
+        return;
+      }
+
+      fileMimeType = file.type || null;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileBase64 = e.target.result; // data:<mime>;base64,....
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Salvataggio nuova azienda (POST)
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      formMessaggi.textContent = "";
+      formMessaggi.className = "";
+
+      const nome = document.getElementById("nome").value.trim();
+      const prezzoValue = document.getElementById("prezzo").value;
+      const prezzo = prezzoValue ? Number(prezzoValue) : null;
+
+      if (!nome || prezzo === null || Number.isNaN(prezzo)) {
+        formMessaggi.textContent = "Compila correttamente tutti i campi.";
+        formMessaggi.className = "error";
+        return;
+      }
+
+      const payload = {
+        nome,
+        prezzo,
+        file: fileBase64,
+        mimeType: fileMimeType,
+      };
+
+      const submitButton = form.querySelector("button[type=submit]");
+      submitButton.disabled = true;
+
+      fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Errore HTTP " + res.status);
+          }
+          return res.json().catch(() => null);
+        })
+        .then(() => {
+          formMessaggi.textContent = "Azienda salvata con successo.";
+          formMessaggi.className = "success";
+          form.reset();
+          fileBase64 = null;
+          fileMimeType = null;
+          caricaAziende();
+        })
+        .catch((err) => {
+          console.error("Errore salvataggio azienda:", err);
+          formMessaggi.textContent =
+            "Errore nel salvataggio dell'azienda. Controlla la console.";
+          formMessaggi.className = "error";
+        })
+        .finally(() => {
+          submitButton.disabled = false;
+        });
+    });
+
+    // Carica elenco aziende (GET)
+    function caricaAziende() {
+      listaAziende.textContent = "Caricamento in corso...";
+
+      fetch(API)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Errore HTTP " + res.status);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("RISPOSTA API", data);
+
+          // accetta sia un array diretto che { aziende: [...] }
+          const aziende = Array.isArray(data)
+            ? data
+            : data.aziende || [];
+
+          listaAziende.innerHTML = "";
+
+          if (!aziende.length) {
+            listaAziende.textContent = "Nessuna azienda presente.";
+            listaAziende.className = "muted";
+            return;
+          }
+
+          listaAziende.className = "";
+
+          aziende.forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "azienda";
+
+            // contenitore info testuali
+            const infoDiv = document.createElement("div");
+            infoDiv.className = "azienda-info";
+
+            // immagine / pdf
+            let mediaHtml = "";
+
+            if (item.mimeType && item.file) {
+              if (item.mimeType.startsWith("application/pdf")) {
+                mediaHtml = `<a href="${item.file}" target="_blank">Visualizza PDF</a>`;
+              } else if (item.mimeType.startsWith("image/")) {
+                mediaHtml = `<img src="${item.file}" alt="">`;
+              }
+            } else if (item.file) {
+              // fallback generico: se non c'è mimeType ma c'è il file
+              mediaHtml = `<img src="${item.file}" alt="">`;
+            }
+
+            if (mediaHtml) {
+              const wrapper = document.createElement("div");
+              wrapper.innerHTML = mediaHtml;
+              const mediaNode = wrapper.firstChild;
+              div.appendChild(mediaNode);
+            }
+
+            // testo
+            const nome = item.nome ?? "";
+            const prezzo = item.prezzo != null ? `€${item.prezzo}` : "";
+
+            infoDiv.innerHTML = `
+              <strong>${nome}</strong>
+              <div class="muted">${prezzo}</div>
+            `;
+
+            div.appendChild(infoDiv);
+            listaAziende.appendChild(div);
+          });
+        })
+        .catch((err) => {
+          console.error("Errore in caricaAziende:", err);
+          listaAziende.textContent =
+            "Errore nel caricamento delle aziende. Controlla la console.";
+          listaAziende.className = "error";
+        });
+    }
+
+    // Caricamento iniziale
+    document.addEventListener("DOMContentLoaded", caricaAziende);
+  </script>
 </body>
 </html>
