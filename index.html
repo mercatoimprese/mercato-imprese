@@ -67,7 +67,7 @@
       reader.readAsDataURL(file);
     }
 
-    function caricaAziende() {    
+        function caricaAziende() {
       fetch(API)
         .then(res => res.json())
         .then(data => {
@@ -77,11 +77,15 @@
             const div = document.createElement("div");
             div.className = "azienda";
             let content = "";
-            if (item.file.includes("data:image")) {
-              content += `<img src="${item.file}" alt="">`;
-            } else {
+
+            if (item.mimeType && item.mimeType.startsWith("application/pdf")) {
+              // è un PDF
               content += `<a href="${item.file}" target="_blank">Visualizza PDF</a><br>`;
+            } else if (item.file) {
+              // è una immagine
+              content += `<img src="${item.file}" alt="">`;
             }
+
             content += `<strong>${item.nome}</strong> - €${item.prezzo}`;
             div.innerHTML = content;
             container.appendChild(div);
