@@ -17,6 +17,10 @@
       margin-top: 0;
     }
 
+    [hidden] {
+      display: none !important;
+    }
+
     a {
       color: #58a6ff;
     }
@@ -42,6 +46,7 @@
 
     input[type="text"],
     input[type="number"],
+    input[type="password"],
     input[type="file"] {
       width: 100%;
       box-sizing: border-box;
@@ -78,6 +83,18 @@
     .secondary {
       border-color: #30363d;
       background: #21262d;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .topbar h1 {
+      margin-bottom: 0;
     }
 
     #lista-aziende {
@@ -172,10 +189,24 @@
 </head>
 <body>
   <div class="container">
-    <h1>Mercato Imprese</h1>
+    <div class="topbar">
+      <h1>Mercato Imprese</h1>
+      <a href="admin.html">Area riservata</a>
+    </div>
+
+    <!-- LOGIN AREA RISERVATA -->
+    <div class="card" id="admin-login" hidden>
+      <h2>Area riservata</h2>
+      <form id="login-form">
+        <label for="admin-password">Password</label>
+        <input type="password" id="admin-password" autocomplete="current-password" required />
+        <button type="submit">Accedi</button>
+        <div id="login-messaggi"></div>
+      </form>
+    </div>
 
     <!-- FORM NUOVA AZIENDA -->
-    <div class="card">
+    <div class="card" id="admin-panel" hidden>
       <h2>Nuova azienda</h2>
       <form id="azienda-form">
         <label for="nome">Nome azienda</label>
@@ -197,6 +228,9 @@
           <button type="button" id="svuota-locale" class="secondary">
             Svuota archivio locale
           </button>
+          <button type="button" id="admin-logout" class="secondary">
+            Esci
+          </button>
         </div>
         <div id="form-messaggi"></div>
       </form>
@@ -213,6 +247,8 @@
     // URL della API Google Apps Script. Se non risponde, il sito salva comunque nel browser.
     const API = "https://script.google.com/macros/s/AKfycbys7MS7IqU63wueVOYaZGlEyldR5bEWlNxQ_vUBdasrcJ_IscUpOUIVi1xDRl9w_MsuYg/exec";
     const STORAGE_KEY = "mercato-imprese-aziende";
+    const ADMIN_SESSION_KEY = "mercato-imprese-admin";
+    const ADMIN_PASSWORD_HASH = "dd9d5285c048b6286330872e04ce80a276188bb1a5cb72fcf590401ae8f027c9";
 
     let aziendeRemote = [];
     let aziendeLocali = [];
@@ -222,6 +258,56 @@
     const formMessaggi = document.getElementById("form-messaggi");
     const listaAziende = document.getElementById("lista-aziende");
     const svuotaLocaleButton = document.getElementById("svuota-locale");
+    const adminLogin = document.getElementById("admin-login");
+    const adminPanel = document.getElementById("admin-panel");
+    const loginForm = document.getElementById("login-form");
+    const loginMessaggi = document.getElementById("login-messaggi");
+    const adminLogout = document.getElementById("admin-logout");
+    const adminMode = new URLSearchParams(window.location.search).has("admin");
+
+    function aggiornaAreaRiservata() {
+      if (!adminMode) {
+        adminLogin.hidden = true;
+        adminPanel.hidden = true;
+        return;
+      }
+
+      const accessoOk = sessionStorage.getItem(ADMIN_SESSION_KEY) === "ok";
+      adminLogin.hidden = accessoOk;
+      adminPanel.hidden = !accessoOk;
+    }
+
+    async function calcolaHash(testo) {
+      const bytes = new TextEncoder().encode(testo);
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      loginMessaggi.textContent = "";
+      loginMessaggi.className = "";
+
+      const password = document.getElementById("admin-password").value;
+      const hash = await calcolaHash(password);
+
+      if (hash !== ADMIN_PASSWORD_HASH) {
+        loginMessaggi.textContent = "Password non corretta.";
+        loginMessaggi.className = "error";
+        return;
+      }
+
+      sessionStorage.setItem(ADMIN_SESSION_KEY, "ok");
+      loginForm.reset();
+      aggiornaAreaRiservata();
+    });
+
+    adminLogout.addEventListener("click", () => {
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      window.location.href = "index.html";
+    });
 
     function leggiArchivioLocale() {
       try {
@@ -529,7 +615,10 @@
     });
 
     // Caricamento iniziale
-    document.addEventListener("DOMContentLoaded", caricaAziende);
+    document.addEventListener("DOMContentLoaded", () => {
+      aggiornaAreaRiservata();
+      caricaAziende();
+    });
   </script>
 </body>
 </html>
