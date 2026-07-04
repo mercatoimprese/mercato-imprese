@@ -68,6 +68,18 @@
       cursor: not-allowed;
     }
 
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .secondary {
+      border-color: #30363d;
+      background: #21262d;
+    }
+
     #lista-aziende {
       display: grid;
       gap: 12px;
@@ -94,6 +106,7 @@
 
     .azienda-info {
       flex: 1;
+      min-width: 0;
     }
 
     .azienda strong {
@@ -117,6 +130,37 @@
       color: #3fb950;
       margin-top: 8px;
       font-size: 14px;
+    }
+
+    .azienda-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .danger {
+      border-color: #da3633;
+      background: #da3633;
+    }
+
+    .status-note {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .azienda {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .azienda img {
+        max-width: 100%;
+        width: 100%;
+        max-height: 220px;
+      }
+
+      .azienda-actions {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -142,7 +186,12 @@
           accept="image/*,application/pdf"
         />
 
-        <button type="submit">Salva azienda</button>
+        <div class="button-row">
+          <button type="submit">Salva azienda</button>
+          <button type="button" id="svuota-locale" class="secondary">
+            Svuota archivio locale
+          </button>
+        </div>
         <div id="form-messaggi"></div>
       </form>
     </div>
@@ -155,37 +204,75 @@
   </div>
 
   <script>
-    // ✅ URL reale della tua API Google Apps Script
+    // URL della API Google Apps Script. Se non risponde, il sito salva comunque nel browser.
     const API = "https://script.google.com/macros/s/AKfycbys7MS7IqU63wueVOYaZGlEyldR5bEWlNxQ_vUBdasrcJ_IscUpOUIVi1xDRl9w_MsuYg/exec";
+    const STORAGE_KEY = "mercato-imprese-aziende";
 
-    let fileBase64 = null;
-    let fileMimeType = null;
+    let aziendeRemote = [];
+    let aziendeLocali = [];
 
     const fileInput = document.getElementById("file");
     const form = document.getElementById("azienda-form");
     const formMessaggi = document.getElementById("form-messaggi");
     const listaAziende = document.getElementById("lista-aziende");
+    const svuotaLocaleButton = document.getElementById("svuota-locale");
 
-    // Legge il file selezionato come base64
-    fileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      if (!file) {
-        fileBase64 = null;
-        fileMimeType = null;
-        return;
+    function leggiArchivioLocale() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        aziendeLocali = raw ? JSON.parse(raw) : [];
+      } catch (err) {
+        console.error("Archivio locale non leggibile:", err);
+        aziendeLocali = [];
+      }
+    }
+
+    function salvaArchivioLocale() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(aziendeLocali));
+    }
+
+    function leggiFileComeDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) {
+          resolve({ file: null, mimeType: null, fileName: null });
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          resolve({
+            file: event.target.result,
+            mimeType: file.type || "application/octet-stream",
+            fileName: file.name,
+          });
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function provaSalvataggioRemoto(payload) {
+      if (!API) {
+        return false;
       }
 
-      fileMimeType = file.type || null;
+      try {
+        const res = await fetch(API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify(payload),
+        });
+        return res.ok;
+      } catch (err) {
+        console.warn("Salvataggio remoto non disponibile:", err);
+        return false;
+      }
+    }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        fileBase64 = e.target.result; // data:<mime>;base64,....
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Salvataggio nuova azienda (POST)
-    form.addEventListener("submit", (event) => {
+    // Salvataggio nuova azienda
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       formMessaggi.textContent = "";
       formMessaggi.className = "";
@@ -200,126 +287,185 @@
         return;
       }
 
-      const payload = {
-        nome,
-        prezzo,
-        file: fileBase64,
-        mimeType: fileMimeType,
-      };
-
       const submitButton = form.querySelector("button[type=submit]");
       submitButton.disabled = true;
 
-      fetch(API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Errore HTTP " + res.status);
-          }
-          return res.json().catch(() => null);
-        })
-        .then(() => {
-          formMessaggi.textContent = "Azienda salvata con successo.";
-          formMessaggi.className = "success";
-          form.reset();
-          fileBase64 = null;
-          fileMimeType = null;
-          caricaAziende();
-        })
-        .catch((err) => {
-          console.error("Errore salvataggio azienda:", err);
-          formMessaggi.textContent =
-            "Errore nel salvataggio dell'azienda. Controlla la console.";
-          formMessaggi.className = "error";
-        })
-        .finally(() => {
-          submitButton.disabled = false;
-        });
+      try {
+        const allegato = await leggiFileComeDataUrl(fileInput.files[0]);
+        const azienda = {
+          id: globalThis.crypto && crypto.randomUUID
+            ? crypto.randomUUID()
+            : String(Date.now()),
+          nome,
+          prezzo,
+          dataCreazione: new Date().toISOString(),
+          origine: "locale",
+          ...allegato,
+        };
+
+        aziendeLocali.unshift(azienda);
+        salvaArchivioLocale();
+
+        const remotoOk = await provaSalvataggioRemoto(azienda);
+        formMessaggi.textContent = remotoOk
+          ? "Azienda salvata con successo anche online."
+          : "Azienda salvata nel browser. Il salvataggio online non e' ancora disponibile.";
+        formMessaggi.className = remotoOk ? "success" : "success";
+
+        form.reset();
+        renderAziende();
+      } catch (err) {
+        console.error("Errore salvataggio azienda:", err);
+        formMessaggi.textContent =
+          "Non sono riuscito a salvare l'azienda. Prova con un file piu' leggero.";
+        formMessaggi.className = "error";
+      } finally {
+        submitButton.disabled = false;
+      }
     });
 
     // Carica elenco aziende (GET)
-    function caricaAziende() {
+    async function caricaAziende() {
       listaAziende.textContent = "Caricamento in corso...";
+      leggiArchivioLocale();
 
-      fetch(API)
-        .then((res) => {
+      try {
+        if (API) {
+          const res = await fetch(API);
           if (!res.ok) {
             throw new Error("Errore HTTP " + res.status);
           }
-          return res.json();
-        })
-        .then((data) => {
-          console.log("RISPOSTA API", data);
 
-          // accetta sia un array diretto che { aziende: [...] }
-          const aziende = Array.isArray(data)
-            ? data
-            : data.aziende || [];
+          const data = await res.json();
+          aziendeRemote = Array.isArray(data) ? data : data.aziende || [];
+        }
+      } catch (err) {
+        console.warn("Caricamento remoto non disponibile:", err);
+        aziendeRemote = [];
+      }
 
-          listaAziende.innerHTML = "";
-
-          if (!aziende.length) {
-            listaAziende.textContent = "Nessuna azienda presente.";
-            listaAziende.className = "muted";
-            return;
-          }
-
-          listaAziende.className = "";
-
-          aziende.forEach((item) => {
-            const div = document.createElement("div");
-            div.className = "azienda";
-
-            // contenitore info testuali
-            const infoDiv = document.createElement("div");
-            infoDiv.className = "azienda-info";
-
-            // immagine / pdf
-            let mediaHtml = "";
-
-            if (item.mimeType && item.file) {
-              if (item.mimeType.startsWith("application/pdf")) {
-                mediaHtml = `<a href="${item.file}" target="_blank">Visualizza PDF</a>`;
-              } else if (item.mimeType.startsWith("image/")) {
-                mediaHtml = `<img src="${item.file}" alt="">`;
-              }
-            } else if (item.file) {
-              // fallback generico: se non c'è mimeType ma c'è il file
-              mediaHtml = `<img src="${item.file}" alt="">`;
-            }
-
-            if (mediaHtml) {
-              const wrapper = document.createElement("div");
-              wrapper.innerHTML = mediaHtml;
-              const mediaNode = wrapper.firstChild;
-              div.appendChild(mediaNode);
-            }
-
-            // testo
-            const nome = item.nome ?? "";
-            const prezzo = item.prezzo != null ? `€${item.prezzo}` : "";
-
-            infoDiv.innerHTML = `
-              <strong>${nome}</strong>
-              <div class="muted">${prezzo}</div>
-            `;
-
-            div.appendChild(infoDiv);
-            listaAziende.appendChild(div);
-          });
-        })
-        .catch((err) => {
-          console.error("Errore in caricaAziende:", err);
-          listaAziende.textContent =
-            "Errore nel caricamento delle aziende. Controlla la console.";
-          listaAziende.className = "error";
-        });
+      renderAziende();
     }
+
+    function renderAziende() {
+      const aziende = [
+        ...aziendeLocali,
+        ...aziendeRemote.map((azienda, index) => ({
+          ...azienda,
+          id: azienda.id || `remota-${index}`,
+          origine: "remota",
+        })),
+      ];
+
+      listaAziende.innerHTML = "";
+
+      if (!aziende.length) {
+        listaAziende.textContent = "Nessuna azienda presente.";
+        listaAziende.className = "muted";
+        return;
+      }
+
+      listaAziende.className = "";
+
+      aziende.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "azienda";
+
+        const mediaNode = creaMedia(item);
+        if (mediaNode) {
+          div.appendChild(mediaNode);
+        }
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "azienda-info";
+
+        const nome = document.createElement("strong");
+        nome.textContent = item.nome || "Azienda senza nome";
+
+        const prezzo = document.createElement("div");
+        prezzo.className = "muted";
+        prezzo.textContent = item.prezzo != null ? formattaPrezzo(item.prezzo) : "";
+
+        const origine = document.createElement("div");
+        origine.className = "muted status-note";
+        origine.textContent = item.origine === "locale"
+          ? "Salvata in questo browser"
+          : "Caricata online";
+
+        infoDiv.appendChild(nome);
+        infoDiv.appendChild(prezzo);
+        infoDiv.appendChild(origine);
+
+        div.appendChild(infoDiv);
+
+        if (item.origine === "locale") {
+          const actions = document.createElement("div");
+          actions.className = "azienda-actions";
+
+          const elimina = document.createElement("button");
+          elimina.type = "button";
+          elimina.className = "danger";
+          elimina.textContent = "Elimina";
+          elimina.addEventListener("click", () => eliminaAziendaLocale(item.id));
+
+          actions.appendChild(elimina);
+          div.appendChild(actions);
+        }
+
+        listaAziende.appendChild(div);
+      });
+    }
+
+    function creaMedia(item) {
+      if (!item.file) {
+        return null;
+      }
+
+      if (item.mimeType && item.mimeType.startsWith("application/pdf")) {
+        const link = document.createElement("a");
+        link.href = item.file;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = item.fileName || "Visualizza PDF";
+        return link;
+      }
+
+      const img = document.createElement("img");
+      img.src = item.file;
+      img.alt = item.nome ? `Foto ${item.nome}` : "Foto azienda";
+      return img;
+    }
+
+    function formattaPrezzo(prezzo) {
+      return new Intl.NumberFormat("it-IT", {
+        style: "currency",
+        currency: "EUR",
+      }).format(Number(prezzo));
+    }
+
+    function eliminaAziendaLocale(id) {
+      aziendeLocali = aziendeLocali.filter((azienda) => azienda.id !== id);
+      salvaArchivioLocale();
+      renderAziende();
+    }
+
+    svuotaLocaleButton.addEventListener("click", () => {
+      if (!aziendeLocali.length) {
+        formMessaggi.textContent = "L'archivio locale e' gia' vuoto.";
+        formMessaggi.className = "success";
+        return;
+      }
+
+      if (!confirm("Vuoi eliminare tutte le aziende salvate in questo browser?")) {
+        return;
+      }
+
+      aziendeLocali = [];
+      salvaArchivioLocale();
+      formMessaggi.textContent = "Archivio locale svuotato.";
+      formMessaggi.className = "success";
+      renderAziende();
+    });
 
     // Caricamento iniziale
     document.addEventListener("DOMContentLoaded", caricaAziende);
