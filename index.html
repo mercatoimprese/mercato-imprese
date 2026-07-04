@@ -137,6 +137,12 @@
       justify-content: flex-end;
     }
 
+    .media-fallback {
+      color: #8b949e;
+      font-size: 14px;
+      max-width: 160px;
+    }
+
     .danger {
       border-color: #da3633;
       background: #da3633;
@@ -431,9 +437,64 @@
       }
 
       const img = document.createElement("img");
-      img.src = item.file;
       img.alt = item.nome ? `Foto ${item.nome}` : "Foto azienda";
+
+      if (estraiDriveId(item.file)) {
+        caricaImmagineDrive(img, item.file);
+      } else {
+        img.src = item.file;
+        img.addEventListener("error", () => mostraAllegatoNonDisponibile(img));
+      }
+
       return img;
+    }
+
+    async function caricaImmagineDrive(img, url) {
+      try {
+        const res = await fetch(url, {
+          mode: "cors",
+          credentials: "omit",
+        });
+
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+
+        const blob = await res.blob();
+        if (!blob.size || !blob.type.startsWith("image/")) {
+          throw new Error("File immagine vuoto o non valido");
+        }
+
+        img.src = URL.createObjectURL(blob);
+      } catch (err) {
+        console.warn("Foto Drive non visualizzabile:", err);
+        mostraAllegatoNonDisponibile(img);
+      }
+    }
+
+    function mostraAllegatoNonDisponibile(node) {
+      const box = document.createElement("div");
+      box.className = "media-fallback";
+      box.textContent = "Foto non disponibile. Ricarica l'immagine.";
+      node.replaceWith(box);
+    }
+
+    function estraiDriveId(url) {
+      const patterns = [
+        /drive\.google\.com\/file\/d\/([^/]+)/,
+        /drive\.google\.com\/uc\?[^#]*id=([^&#]+)/,
+        /drive\.google\.com\/open\?[^#]*id=([^&#]+)/,
+        /drive\.google\.com\/thumbnail\?[^#]*id=([^&#]+)/,
+      ];
+
+      for (const pattern of patterns) {
+        const match = String(url).match(pattern);
+        if (match) {
+          return decodeURIComponent(match[1]);
+        }
+      }
+
+      return null;
     }
 
     function formattaPrezzo(prezzo) {

@@ -13,6 +13,7 @@ function doGet() {
       headers.forEach((header, index) => {
         item[header] = row[index];
       });
+      item.file = preparaFilePerSito(item);
       return item;
     });
 
@@ -95,6 +96,49 @@ function salvaAllegato(id, body) {
   return {
     url: `https://drive.google.com/uc?export=view&id=${file.getId()}`,
   };
+}
+
+function preparaFilePerSito(item) {
+  if (!item.file || !item.mimeType || !String(item.mimeType).startsWith("image/")) {
+    return item.file || "";
+  }
+
+  const fileId = estraiDriveId(item.file);
+  if (!fileId) {
+    return item.file;
+  }
+
+  try {
+    const file = DriveApp.getFileById(fileId);
+    const blob = file.getBlob();
+    const bytes = blob.getBytes();
+    if (!bytes.length) {
+      return "";
+    }
+
+    return `data:${item.mimeType};base64,${Utilities.base64Encode(bytes)}`;
+  } catch (err) {
+    console.warn("File Drive non leggibile", err);
+    return "";
+  }
+}
+
+function estraiDriveId(url) {
+  const patterns = [
+    /drive\.google\.com\/file\/d\/([^/]+)/,
+    /drive\.google\.com\/uc\?[^#]*id=([^&#]+)/,
+    /drive\.google\.com\/open\?[^#]*id=([^&#]+)/,
+    /drive\.google\.com\/thumbnail\?[^#]*id=([^&#]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = String(url).match(pattern);
+    if (match) {
+      return decodeURIComponent(match[1]);
+    }
+  }
+
+  return null;
 }
 
 function getFolder() {
