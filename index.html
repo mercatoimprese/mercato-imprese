@@ -2,8 +2,50 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Mercato Imprese</title>
+  <title>Aziende in vendita e compravendita aziende | Mercato Imprese</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Mercato Imprese raccoglie annunci di aziende in vendita, attivita commerciali cedesi e opportunita di acquisizione per imprenditori e investitori."
+  />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Mercato Imprese" />
+  <meta
+    name="keywords"
+    content="aziende in vendita, vendita aziende, aziende cedesi, cessione attivita, acquisizione aziende, compravendita aziende, attivita commerciali in vendita"
+  />
+  <link rel="canonical" href="https://mercatoimprese.github.io/mercato-imprese/" />
+  <meta property="og:title" content="Aziende in vendita | Mercato Imprese" />
+  <meta
+    property="og:description"
+    content="Annunci e opportunita per comprare, vendere o acquisire aziende e attivita commerciali."
+  />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mercatoimprese.github.io/mercato-imprese/" />
+  <meta property="og:image" content="https://mercatoimprese.github.io/mercato-imprese/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Mercato Imprese",
+      "url": "https://mercatoimprese.github.io/mercato-imprese/",
+      "description": "Annunci di aziende in vendita, cessione attivita e opportunita di acquisizione.",
+      "inLanguage": "it-IT",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mercato Imprese",
+        "logo": "https://mercatoimprese.github.io/mercato-imprese/logo.png"
+      },
+      "about": [
+        "aziende in vendita",
+        "vendita aziende",
+        "cessione attivita",
+        "compravendita aziende",
+        "acquisizione aziende"
+      ]
+    }
+  </script>
   <style>
     :root {
       --bg: #f4f7fb;
@@ -185,6 +227,58 @@
       white-space: nowrap;
     }
 
+    .hero {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 14px 34px rgba(12, 39, 70, 0.08);
+    }
+
+    .hero h1 {
+      margin-bottom: 0;
+      max-width: 820px;
+      font-size: clamp(30px, 5vw, 52px);
+      line-height: 1.04;
+      color: var(--blue-strong);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    .seo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .seo-item {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    .seo-item h2 {
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .seo-item p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     #lista-aziende {
       display: grid;
       gap: 16px;
@@ -298,6 +392,18 @@
         width: 100%;
       }
 
+      .hero {
+        padding: 20px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .seo-grid {
+        grid-template-columns: 1fr;
+      }
+
       .azienda {
         align-items: flex-start;
         flex-direction: column;
@@ -332,6 +438,39 @@
       </a>
       <a href="admin.html" class="admin-link">Area riservata</a>
     </div>
+
+    <section class="hero">
+      <h1>Aziende in vendita, attivita cedesi e opportunita di acquisizione</h1>
+      <p>
+        Mercato Imprese presenta annunci per chi vuole comprare un'azienda,
+        vendere un'attivita commerciale o valutare opportunita di acquisizione
+        in Italia.
+      </p>
+    </section>
+
+    <section class="seo-grid" aria-label="Servizi Mercato Imprese">
+      <article class="seo-item">
+        <h2>Aziende in vendita</h2>
+        <p>
+          Consulta annunci di aziende, societa e attivita commerciali disponibili
+          per cessione o subentro.
+        </p>
+      </article>
+      <article class="seo-item">
+        <h2>Vendere un'azienda</h2>
+        <p>
+          Pubblica una proposta riservata e presenta prezzo, foto e informazioni
+          essenziali per potenziali acquirenti.
+        </p>
+      </article>
+      <article class="seo-item">
+        <h2>Acquisizione aziende</h2>
+        <p>
+          Trova opportunita per imprenditori, investitori e professionisti
+          interessati alla compravendita di imprese.
+        </p>
+      </article>
+    </section>
 
     <!-- LOGIN AREA RISERVATA -->
     <div class="card" id="admin-login" hidden>
@@ -378,7 +517,7 @@
 
     <!-- LISTA AZIENDE -->
     <div class="card">
-      <h2>Elenco aziende</h2>
+      <h2>Annunci aziende in vendita</h2>
       <div id="lista-aziende" class="muted">Caricamento in corso...</div>
     </div>
   </div>
