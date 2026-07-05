@@ -13,7 +13,17 @@ function doGet() {
       headers.forEach((header, index) => {
         item[header] = row[index];
       });
-      item.file = preparaFilePerSito(item);
+      const files = preparaFilesPerSito(item);
+      item.files = files;
+      if (files.length) {
+        item.file = files[0].file;
+        item.mimeType = files[0].mimeType;
+        item.fileName = files[0].fileName;
+      } else {
+        item.file = "";
+        item.mimeType = "";
+        item.fileName = "";
+      }
       return item;
     });
 
@@ -24,19 +34,26 @@ function doPost(event) {
   const body = parseBody(event);
   const sheet = getSheet();
   const id = body.id || Utilities.getUuid();
-  const allegato = salvaAllegato(id, body);
+  const allegati = salvaAllegati(id, body);
+  const primoAllegato = allegati[0] || salvaAllegato(id, body);
 
   sheet.appendRow([
     id,
     body.nome || "",
     body.prezzo || "",
-    body.mimeType || "",
-    body.fileName || "",
-    allegato.url || body.file || "",
+    primoAllegato.mimeType || body.mimeType || "",
+    primoAllegato.fileName || body.fileName || "",
+    primoAllegato.file || body.file || "",
     new Date().toISOString(),
+    JSON.stringify(allegati),
   ]);
 
-  return json({ ok: true, id, file: allegato.url || body.file || "" });
+  return json({
+    ok: true,
+    id,
+    file: primoAllegato.file || body.file || "",
+    files: allegati,
+  });
 }
 
 function parseBody(event) {
@@ -73,10 +90,23 @@ function getSheet() {
       "fileName",
       "file",
       "dataCreazione",
+      "files",
     ]);
+  } else {
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    if (headers.indexOf("files") === -1) {
+      sheet.getRange(1, sheet.getLastColumn() + 1).setValue("files");
+    }
   }
 
   return sheet;
+}
+
+function salvaAllegati(id, body) {
+  const inputFiles = Array.isArray(body.files) ? body.files : [];
+  return inputFiles
+    .map((item, index) => salvaAllegato(`${id}-${index + 1}`, item))
+    .filter((item) => item.file);
 }
 
 function salvaAllegato(id, body) {
@@ -94,18 +124,46 @@ function salvaAllegato(id, body) {
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
   return {
-    url: `https://drive.google.com/uc?export=view&id=${file.getId()}`,
+    file: `https://drive.google.com/uc?export=view&id=${file.getId()}`,
+    mimeType: body.mimeType,
+    fileName,
   };
+}
+
+function preparaFilesPerSito(item) {
+  if (item.files) {
+    try {
+      const files = JSON.parse(item.files);
+      if (Array.isArray(files)) {
+        return files.map(preparaFilePerSito).filter((file) => file.file);
+      }
+    } catch (err) {
+      console.warn("Lista file non leggibile", err);
+    }
+  }
+
+  const file = preparaFilePerSito(item);
+  return file ? [file] : [];
 }
 
 function preparaFilePerSito(item) {
   if (!item.file || !item.mimeType || !String(item.mimeType).startsWith("image/")) {
-    return item.file || "";
+    return item.file
+      ? {
+          file: item.file,
+          mimeType: item.mimeType || "",
+          fileName: item.fileName || "",
+        }
+      : null;
   }
 
   const fileId = estraiDriveId(item.file);
   if (!fileId) {
-    return item.file;
+    return {
+      file: item.file,
+      mimeType: item.mimeType,
+      fileName: item.fileName || "",
+    };
   }
 
   try {
@@ -113,13 +171,17 @@ function preparaFilePerSito(item) {
     const blob = file.getBlob();
     const bytes = blob.getBytes();
     if (!bytes.length) {
-      return "";
+      return null;
     }
 
-    return `data:${item.mimeType};base64,${Utilities.base64Encode(bytes)}`;
+    return {
+      file: `data:${item.mimeType};base64,${Utilities.base64Encode(bytes)}`,
+      mimeType: item.mimeType,
+      fileName: item.fileName || file.getName(),
+    };
   } catch (err) {
     console.warn("File Drive non leggibile", err);
-    return "";
+    return null;
   }
 }
 

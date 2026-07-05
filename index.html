@@ -121,6 +121,27 @@
       background: #161b22;
     }
 
+    .media-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 80px);
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .media-gallery a,
+    .media-gallery .media-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+      padding: 6px;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      background: #161b22;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
     .azienda-info {
       flex: 1;
       min-width: 0;
@@ -181,6 +202,11 @@
         max-height: 220px;
       }
 
+      .media-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
       .azienda-actions {
         width: 100%;
       }
@@ -215,12 +241,13 @@
         <label for="prezzo">Prezzo</label>
         <input type="number" id="prezzo" name="prezzo" step="0.01" min="0" required />
 
-        <label for="file">File (immagine o PDF)</label>
+        <label for="file">Foto o PDF</label>
         <input
           type="file"
           id="file"
           name="file"
           accept="image/*,application/pdf"
+          multiple
         />
 
         <div class="button-row">
@@ -343,6 +370,11 @@
       });
     }
 
+    async function leggiFilesComeDataUrl(fileList) {
+      const files = Array.from(fileList || []);
+      return Promise.all(files.map(leggiFileComeDataUrl));
+    }
+
     async function provaSalvataggioRemoto(payload) {
       if (!API) {
         return false;
@@ -383,7 +415,12 @@
       submitButton.disabled = true;
 
       try {
-        const allegato = await leggiFileComeDataUrl(fileInput.files[0]);
+        const allegati = await leggiFilesComeDataUrl(fileInput.files);
+        const primoAllegato = allegati[0] || {
+          file: null,
+          mimeType: null,
+          fileName: null,
+        };
         const azienda = {
           id: globalThis.crypto && crypto.randomUUID
             ? crypto.randomUUID()
@@ -392,7 +429,8 @@
           prezzo,
           dataCreazione: new Date().toISOString(),
           origine: "locale",
-          ...allegato,
+          files: allegati,
+          ...primoAllegato,
         };
 
         aziendeLocali.unshift(azienda);
@@ -463,7 +501,7 @@
         const div = document.createElement("div");
         div.className = "azienda";
 
-        const mediaNode = creaMedia(item);
+        const mediaNode = creaMediaGallery(item);
         if (mediaNode) {
           div.appendChild(mediaNode);
         }
@@ -508,54 +546,89 @@
       });
     }
 
-    function creaMedia(item) {
-      if (!item.file) {
+    function creaMediaGallery(item) {
+      const allegati = ottieniAllegati(item);
+      if (!allegati.length) {
         return null;
       }
 
-      if (item.mimeType && item.mimeType.startsWith("application/pdf")) {
+      const gallery = document.createElement("div");
+      gallery.className = "media-gallery";
+
+      allegati.forEach((allegato) => {
+        gallery.appendChild(creaMedia(allegato, item.nome));
+      });
+
+      return gallery;
+    }
+
+    function creaMedia(allegato, nomeAzienda) {
+      if (allegato.mimeType && allegato.mimeType.startsWith("application/pdf")) {
         const link = document.createElement("a");
-        link.href = item.file;
+        link.href = allegato.file;
         link.target = "_blank";
         link.rel = "noopener";
-        link.textContent = item.fileName || "Visualizza PDF";
+        link.textContent = allegato.fileName || "Visualizza PDF";
         return link;
       }
 
       const img = document.createElement("img");
-      img.alt = item.nome ? `Foto ${item.nome}` : "Foto azienda";
+      img.alt = nomeAzienda ? `Foto ${nomeAzienda}` : "Foto azienda";
 
-      if (estraiDriveId(item.file)) {
-        caricaImmagineDrive(img, item.file);
+      if (estraiDriveId(allegato.file)) {
+        caricaImmagineDrive(img, allegato.file);
       } else {
-        img.src = item.file;
+        img.src = allegato.file;
         img.addEventListener("error", () => mostraAllegatoNonDisponibile(img));
       }
 
       return img;
     }
 
-    async function caricaImmagineDrive(img, url) {
-      try {
-        const res = await fetch(url, {
-          mode: "cors",
-          credentials: "omit",
-        });
-
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status);
-        }
-
-        const blob = await res.blob();
-        if (!blob.size || !blob.type.startsWith("image/")) {
-          throw new Error("File immagine vuoto o non valido");
-        }
-
-        img.src = URL.createObjectURL(blob);
-      } catch (err) {
-        console.warn("Foto Drive non visualizzabile:", err);
-        mostraAllegatoNonDisponibile(img);
+    function ottieniAllegati(item) {
+      if (Array.isArray(item.files) && item.files.length) {
+        return item.files.filter((allegato) => allegato && allegato.file);
       }
+
+      if (typeof item.files === "string" && item.files.trim()) {
+        try {
+          const files = JSON.parse(item.files);
+          if (Array.isArray(files)) {
+            return files.filter((allegato) => allegato && allegato.file);
+          }
+        } catch (err) {
+          console.warn("Lista allegati non leggibile:", err);
+        }
+      }
+
+      if (item.file) {
+        return [{
+          file: item.file,
+          mimeType: item.mimeType || "",
+          fileName: item.fileName || "",
+        }];
+      }
+
+      return [];
+    }
+
+    async function caricaImmagineDrive(img, url) {
+      const driveId = estraiDriveId(url);
+      const thumbnailUrl = driveId
+        ? `https://drive.google.com/thumbnail?id=${driveId}&sz=w600`
+        : null;
+      let tentativoThumbnail = false;
+
+      img.addEventListener("error", () => {
+        if (thumbnailUrl && !tentativoThumbnail) {
+          tentativoThumbnail = true;
+          img.src = thumbnailUrl;
+          return;
+        }
+        mostraAllegatoNonDisponibile(img);
+      });
+
+      img.src = url;
     }
 
     function mostraAllegatoNonDisponibile(node) {
