@@ -387,6 +387,7 @@
     // URL della API Google Apps Script. Se non risponde, il sito salva comunque nel browser.
     const API = "https://script.google.com/macros/s/AKfycbys7MS7IqU63wueVOYaZGlEyldR5bEWlNxQ_vUBdasrcJ_IscUpOUIVi1xDRl9w_MsuYg/exec";
     const STORAGE_KEY = "mercato-imprese-aziende";
+    const DELETED_LISTINGS_KEY = "mercato-imprese-annunci-eliminati";
     const ADMIN_SESSION_KEY = "mercato-imprese-admin";
     const ADMIN_PASSWORD_HASH = "dd9d5285c048b6286330872e04ce80a276188bb1a5cb72fcf590401ae8f027c9";
     const LISTINGS_RESET_AT = "2026-07-05T04:35:44Z";
@@ -402,6 +403,8 @@
 
     let aziendeRemote = [];
     let aziendeLocali = [];
+    let eliminatiLocali = [];
+    let remoteDeleteEnabled = false;
 
     const fileInput = document.getElementById("file");
     const form = document.getElementById("azienda-form");
@@ -425,6 +428,10 @@
       const accessoOk = sessionStorage.getItem(ADMIN_SESSION_KEY) === "ok";
       adminLogin.hidden = accessoOk;
       adminPanel.hidden = !accessoOk;
+    }
+
+    function accessoAdminOk() {
+      return adminMode && sessionStorage.getItem(ADMIN_SESSION_KEY) === "ok";
     }
 
     async function calcolaHash(testo) {
@@ -452,6 +459,7 @@
       sessionStorage.setItem(ADMIN_SESSION_KEY, "ok");
       loginForm.reset();
       aggiornaAreaRiservata();
+      renderAziende();
     });
 
     adminLogout.addEventListener("click", () => {
@@ -471,10 +479,22 @@
         console.error("Archivio locale non leggibile:", err);
         aziendeLocali = [];
       }
+
+      try {
+        const rawDeleted = localStorage.getItem(DELETED_LISTINGS_KEY);
+        eliminatiLocali = rawDeleted ? JSON.parse(rawDeleted) : [];
+      } catch (err) {
+        console.error("Elenco eliminati non leggibile:", err);
+        eliminatiLocali = [];
+      }
     }
 
     function salvaArchivioLocale() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(aziendeLocali));
+    }
+
+    function salvaEliminatiLocali() {
+      localStorage.setItem(DELETED_LISTINGS_KEY, JSON.stringify(eliminatiLocali));
     }
 
     function leggiFileComeDataUrl(file) {
@@ -667,6 +687,7 @@
           }
 
           const data = await res.json();
+          remoteDeleteEnabled = !Array.isArray(data) && Number(data.apiVersion || 0) >= 2;
           aziendeRemote = filtraAziendeRemote(Array.isArray(data) ? data : data.aziende || []);
         }
       } catch (err) {
@@ -681,6 +702,10 @@
       const resetTime = Date.parse(LISTINGS_RESET_AT);
       return aziende.filter((azienda) => {
         if (HIDDEN_REMOTE_LISTINGS.includes(chiaveAnnuncio(azienda))) {
+          return false;
+        }
+
+        if (eliminatiLocali.includes(chiaveAnnuncio(azienda))) {
           return false;
         }
 
@@ -750,7 +775,7 @@
 
         div.appendChild(infoDiv);
 
-        if (item.origine === "locale") {
+        if (accessoAdminOk()) {
           const actions = document.createElement("div");
           actions.className = "azienda-actions";
 
@@ -758,7 +783,7 @@
           elimina.type = "button";
           elimina.className = "danger";
           elimina.textContent = "Elimina";
-          elimina.addEventListener("click", () => eliminaAziendaLocale(item.id));
+          elimina.addEventListener("click", () => eliminaAnnuncio(item));
 
           actions.appendChild(elimina);
           div.appendChild(actions);
@@ -889,6 +914,61 @@
       aziendeLocali = aziendeLocali.filter((azienda) => azienda.id !== id);
       salvaArchivioLocale();
       renderAziende();
+    }
+
+    async function eliminaAnnuncio(item) {
+      if (!confirm(`Vuoi eliminare "${item.nome || "questo annuncio"}"?`)) {
+        return;
+      }
+
+      if (item.origine === "locale") {
+        eliminaAziendaLocale(item.id);
+        formMessaggi.textContent = "Annuncio eliminato.";
+        formMessaggi.className = "success";
+        return;
+      }
+
+      const key = chiaveAnnuncio(item);
+      if (!eliminatiLocali.includes(key)) {
+        eliminatiLocali.push(key);
+        salvaEliminatiLocali();
+      }
+
+      let eliminatoOnline = false;
+      if (remoteDeleteEnabled) {
+        eliminatoOnline = await eliminaAnnuncioRemoto(item);
+      }
+
+      formMessaggi.textContent = eliminatoOnline
+        ? "Annuncio eliminato anche online."
+        : "Annuncio nascosto da questa area. Per eliminarlo dal foglio Google aggiorna Google Apps Script.";
+      formMessaggi.className = eliminatoOnline ? "success" : "success";
+      aziendeRemote = aziendeRemote.filter((azienda) => chiaveAnnuncio(azienda) !== key);
+      renderAziende();
+    }
+
+    async function eliminaAnnuncioRemoto(item) {
+      try {
+        const res = await fetch(API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+          body: JSON.stringify({
+            action: "delete",
+            id: item.id || "",
+            key: chiaveAnnuncio(item),
+            nome: item.nome || "",
+            prezzo: item.prezzo || "",
+            file: item.file || "",
+          }),
+        });
+        const data = await res.json().catch(() => null);
+        return res.ok && data && data.ok;
+      } catch (err) {
+        console.warn("Eliminazione remota non disponibile:", err);
+        return false;
+      }
     }
 
     svuotaLocaleButton.addEventListener("click", () => {

@@ -27,12 +27,17 @@ function doGet() {
       return item;
     });
 
-  return json({ aziende });
+  return json({ apiVersion: 2, aziende });
 }
 
 function doPost(event) {
   const body = parseBody(event);
   const sheet = getSheet();
+
+  if (body.action === "delete") {
+    return json(eliminaAnnuncio(sheet, body));
+  }
+
   const id = body.id || Utilities.getUuid();
   const allegati = salvaAllegati(id, body);
   const primoAllegato = allegati[0] || salvaAllegato(id, body);
@@ -54,6 +59,36 @@ function doPost(event) {
     file: primoAllegato.file || body.file || "",
     files: allegati,
   });
+}
+
+function eliminaAnnuncio(sheet, body) {
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0] || [];
+  const idIndex = headers.indexOf("id");
+  const nomeIndex = headers.indexOf("nome");
+  const prezzoIndex = headers.indexOf("prezzo");
+  const fileIndex = headers.indexOf("file");
+  let eliminati = 0;
+
+  for (let rowIndex = values.length - 1; rowIndex >= 1; rowIndex--) {
+    const row = values[rowIndex];
+    const id = idIndex >= 0 ? String(row[idIndex] || "") : "";
+    const key = [
+      nomeIndex >= 0 ? String(row[nomeIndex] || "").trim().toLowerCase() : "",
+      prezzoIndex >= 0 ? String(row[prezzoIndex] || "").trim() : "",
+      fileIndex >= 0 ? String(row[fileIndex] || "").trim() : "",
+    ].join("|");
+
+    if ((body.id && id === String(body.id)) || (body.key && key === body.key)) {
+      sheet.deleteRow(rowIndex + 1);
+      eliminati++;
+    }
+  }
+
+  return {
+    ok: eliminati > 0,
+    deleted: eliminati,
+  };
 }
 
 function parseBody(event) {
