@@ -276,12 +276,15 @@
     const STORAGE_KEY = "mercato-imprese-aziende";
     const ADMIN_SESSION_KEY = "mercato-imprese-admin";
     const ADMIN_PASSWORD_HASH = "dd9d5285c048b6286330872e04ce80a276188bb1a5cb72fcf590401ae8f027c9";
-    const REMOTE_RESET_AT = "2026-07-05T04:26:29Z";
-    const HIDDEN_REMOTE_NAMES = [
-      "test codex",
-      "prova bis",
-      "azienda prova",
-      "azienda prova new",
+    const LISTINGS_RESET_AT = "2026-07-05T04:35:44Z";
+    const HIDDEN_REMOTE_LISTINGS = [
+      "test codex|1|",
+      "prova bis|1000|https://drive.google.com/uc?export=view&id=1r0DXyOVS_rFi016wpbRrol1lB1zPqQdR",
+      "azienda prova|5|https://drive.google.com/uc?export=view&id=10YYjNvjT7x8AbqnLa33yBgr-tCcemlZg",
+      "azienda prova new|10000000|https://drive.google.com/uc?export=view&id=1jx9P5gn8nf3VdGQArV8GmHCW25ioaLp6",
+      "azienda prova pescara|150000|https://drive.google.com/uc?export=view&id=1eyDsgAva15IV0KGZZMHMuLoObp89k8pF",
+      "prova|100|https://drive.google.com/uc?export=view&id=10--FRwkKmLDo6Sykp1WiYikFNW6unt6X",
+      "prova|500|https://drive.google.com/uc?export=view&id=1tgveefKQSQpqHBMveQy-di7mkMK6Xib5",
     ];
 
     let aziendeRemote = [];
@@ -346,7 +349,11 @@
     function leggiArchivioLocale() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        aziendeLocali = raw ? JSON.parse(raw) : [];
+        aziendeLocali = raw
+          ? JSON.parse(raw).filter((azienda) =>
+              Date.parse(azienda.dataCreazione || "") >= Date.parse(LISTINGS_RESET_AT)
+            )
+          : [];
       } catch (err) {
         console.error("Archivio locale non leggibile:", err);
         aziendeLocali = [];
@@ -558,10 +565,9 @@
     }
 
     function filtraAziendeRemote(aziende) {
-      const resetTime = Date.parse(REMOTE_RESET_AT);
+      const resetTime = Date.parse(LISTINGS_RESET_AT);
       return aziende.filter((azienda) => {
-        const nome = String(azienda.nome || "").trim().toLowerCase();
-        if (HIDDEN_REMOTE_NAMES.includes(nome)) {
+        if (HIDDEN_REMOTE_LISTINGS.includes(chiaveAnnuncio(azienda))) {
           return false;
         }
 
@@ -570,6 +576,14 @@
         }
         return Date.parse(azienda.dataCreazione) >= resetTime;
       });
+    }
+
+    function chiaveAnnuncio(azienda) {
+      return [
+        String(azienda.nome || "").trim().toLowerCase(),
+        String(azienda.prezzo || "").trim(),
+        String(azienda.file || "").trim(),
+      ].join("|");
     }
 
     function renderAziende() {
