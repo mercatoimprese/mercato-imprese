@@ -276,6 +276,13 @@
     const STORAGE_KEY = "mercato-imprese-aziende";
     const ADMIN_SESSION_KEY = "mercato-imprese-admin";
     const ADMIN_PASSWORD_HASH = "dd9d5285c048b6286330872e04ce80a276188bb1a5cb72fcf590401ae8f027c9";
+    const REMOTE_RESET_AT = "2026-07-05T04:26:29Z";
+    const HIDDEN_REMOTE_NAMES = [
+      "test codex",
+      "prova bis",
+      "azienda prova",
+      "azienda prova new",
+    ];
 
     let aziendeRemote = [];
     let aziendeLocali = [];
@@ -375,6 +382,74 @@
       return Promise.all(files.map(leggiFileComeDataUrl));
     }
 
+    async function creaCollageFoto(allegati, nome) {
+      const foto = allegati.filter((allegato) =>
+        allegato.mimeType && allegato.mimeType.startsWith("image/") && allegato.file
+      );
+
+      if (foto.length <= 1) {
+        return foto[0] || allegati[0] || {
+          file: null,
+          mimeType: null,
+          fileName: null,
+        };
+      }
+
+      const immagini = await Promise.all(foto.map(caricaImmagineDaDataUrl));
+      const tileSize = 900;
+      const gap = 24;
+      const columns = foto.length === 2 ? 2 : 3;
+      const rows = Math.ceil(immagini.length / columns);
+      const canvas = document.createElement("canvas");
+      canvas.width = columns * tileSize + (columns + 1) * gap;
+      canvas.height = rows * tileSize + (rows + 1) * gap;
+
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      immagini.forEach((img, index) => {
+        const column = index % columns;
+        const row = Math.floor(index / columns);
+        const x = gap + column * (tileSize + gap);
+        const y = gap + row * (tileSize + gap);
+        disegnaImmagineContain(ctx, img, x, y, tileSize, tileSize);
+      });
+
+      return {
+        file: canvas.toDataURL("image/jpeg", 0.88),
+        mimeType: "image/jpeg",
+        fileName: `${normalizzaNomeFile(nome || "azienda")}-foto.jpg`,
+      };
+    }
+
+    function caricaImmagineDaDataUrl(allegato) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = allegato.file;
+      });
+    }
+
+    function disegnaImmagineContain(ctx, img, x, y, width, height) {
+      const scale = Math.min(width / img.naturalWidth, height / img.naturalHeight);
+      const drawWidth = img.naturalWidth * scale;
+      const drawHeight = img.naturalHeight * scale;
+      const drawX = x + (width - drawWidth) / 2;
+      const drawY = y + (height - drawHeight) / 2;
+      ctx.fillStyle = "#f6f8fa";
+      ctx.fillRect(x, y, width, height);
+      ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+    }
+
+    function normalizzaNomeFile(nome) {
+      return nome
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "azienda";
+    }
+
     async function provaSalvataggioRemoto(payload) {
       if (!API) {
         return false;
@@ -416,6 +491,7 @@
 
       try {
         const allegati = await leggiFilesComeDataUrl(fileInput.files);
+        const allegatoOnline = await creaCollageFoto(allegati, nome);
         const primoAllegato = allegati[0] || {
           file: null,
           mimeType: null,
@@ -436,7 +512,11 @@
         aziendeLocali.unshift(azienda);
         salvaArchivioLocale();
 
-        const remotoOk = await provaSalvataggioRemoto(azienda);
+        const remotoOk = await provaSalvataggioRemoto({
+          ...azienda,
+          ...allegatoOnline,
+          files: allegati,
+        });
         formMessaggi.textContent = remotoOk
           ? "Azienda salvata con successo anche online."
           : "Azienda salvata nel browser. Il salvataggio online non e' ancora disponibile.";
@@ -467,7 +547,7 @@
           }
 
           const data = await res.json();
-          aziendeRemote = Array.isArray(data) ? data : data.aziende || [];
+          aziendeRemote = filtraAziendeRemote(Array.isArray(data) ? data : data.aziende || []);
         }
       } catch (err) {
         console.warn("Caricamento remoto non disponibile:", err);
@@ -475,6 +555,21 @@
       }
 
       renderAziende();
+    }
+
+    function filtraAziendeRemote(aziende) {
+      const resetTime = Date.parse(REMOTE_RESET_AT);
+      return aziende.filter((azienda) => {
+        const nome = String(azienda.nome || "").trim().toLowerCase();
+        if (HIDDEN_REMOTE_NAMES.includes(nome)) {
+          return false;
+        }
+
+        if (!azienda.dataCreazione) {
+          return true;
+        }
+        return Date.parse(azienda.dataCreazione) >= resetTime;
+      });
     }
 
     function renderAziende() {
