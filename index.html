@@ -429,6 +429,428 @@
       text-decoration: none;
     }
 
+    .container {
+      max-width: none;
+      padding: 0 0 56px;
+    }
+
+    .section-inner,
+    .header-inner {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 10px 28px rgba(12, 39, 70, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .site-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--blue-strong);
+      text-decoration: none;
+    }
+
+    .site-brand img {
+      width: 176px;
+      max-height: 64px;
+      object-fit: contain;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+
+    .main-nav a {
+      color: var(--blue-strong);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #ffffff !important;
+      box-shadow: 0 8px 18px rgba(7, 52, 92, 0.16);
+    }
+
+    .nav-admin {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+    }
+
+    .hero-v2 {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(247, 251, 255, 0.94) 46%, rgba(226, 239, 250, 0.68) 100%),
+        radial-gradient(circle at 82% 28%, rgba(244, 162, 31, 0.22), transparent 26%),
+        radial-gradient(circle at 74% 58%, rgba(11, 77, 130, 0.2), transparent 31%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-v2::after {
+      content: "";
+      position: absolute;
+      inset: 0 0 0 48%;
+      background:
+        linear-gradient(135deg, rgba(7, 52, 92, 0.12), rgba(255, 255, 255, 0.08)),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.26) 0 2px, transparent 2px 16px);
+      clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.8fr);
+      gap: 40px;
+      align-items: center;
+      min-height: 570px;
+      padding: 64px 0 46px;
+    }
+
+    .hero-copy h1,
+    .section-title,
+    .steps-panel h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--blue-strong);
+      letter-spacing: 0;
+    }
+
+    .hero-copy h1 {
+      max-width: 650px;
+      margin-bottom: 18px;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 0.98;
+    }
+
+    .hero-copy p {
+      max-width: 620px;
+      margin: 0;
+      color: #315989;
+      font-size: 20px;
+      line-height: 1.55;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin: 34px 0 28px;
+    }
+
+    .trust-item {
+      display: grid;
+      gap: 8px;
+      color: var(--blue-strong);
+    }
+
+    .trust-mark,
+    .service-mark,
+    .step-mark {
+      width: 52px;
+      height: 52px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 1px solid #8bb7e6;
+      background: #ffffff;
+      color: var(--blue);
+      font-weight: 850;
+      font-size: 18px;
+    }
+
+    .trust-item strong {
+      font-size: 15px;
+    }
+
+    .trust-item span {
+      color: #315989;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 780;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #ffffff;
+      border: 1px solid var(--blue);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--blue);
+      border: 1px solid var(--blue);
+    }
+
+    .hero-note {
+      align-self: end;
+      padding: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(216, 225, 236, 0.86);
+      box-shadow: 0 18px 44px rgba(7, 52, 92, 0.16);
+    }
+
+    .hero-note .quote {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--blue);
+      font-size: 54px;
+      line-height: 0.7;
+    }
+
+    .hero-note p {
+      margin: 8px 0 22px;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      line-height: 1.45;
+    }
+
+    .hero-note strong,
+    .hero-note span {
+      display: block;
+    }
+
+    .hero-note span {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stats-band {
+      background: linear-gradient(90deg, #07345c, #0b5b96);
+      color: #ffffff;
+    }
+
+    .stats-band .section-inner {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      padding: 28px 0;
+    }
+
+    .stat-item {
+      display: grid;
+      gap: 4px;
+      padding: 0 26px;
+      border-right: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .stat-item:last-child {
+      border-right: 0;
+    }
+
+    .stat-item strong {
+      font-size: 29px;
+      line-height: 1;
+    }
+
+    .stat-item span {
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 14px;
+    }
+
+    .services-section,
+    .steps-section,
+    .contact-section,
+    .listings-shell {
+      padding: 34px 0 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(28px, 4vw, 38px);
+      margin-bottom: 22px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 26px;
+    }
+
+    .service-card {
+      min-height: 260px;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      box-shadow: 0 12px 28px rgba(12, 39, 70, 0.07);
+    }
+
+    .service-mark {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(180deg, #1768bb, #0b4d82);
+      color: #ffffff;
+      border: 0;
+    }
+
+    .service-card h2 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .service-card p {
+      margin: 0;
+      color: #315989;
+      line-height: 1.58;
+    }
+
+    .service-card a {
+      align-self: end;
+      text-decoration: none;
+    }
+
+    .steps-panel {
+      padding: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 12px 28px rgba(12, 39, 70, 0.07);
+    }
+
+    .steps-panel h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: clamp(26px, 3.6vw, 34px);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .step-card {
+      text-align: center;
+      display: grid;
+      justify-items: center;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .step-card h3 {
+      margin: 0;
+      color: var(--blue-strong);
+      font-size: 16px;
+    }
+
+    .step-card p {
+      margin: 0;
+      color: #315989;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.9fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .contact-panel,
+    .about-panel {
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      box-shadow: 0 12px 28px rgba(12, 39, 70, 0.07);
+    }
+
+    .contact-panel h2,
+    .about-panel h2 {
+      margin-bottom: 10px;
+      font-size: 23px;
+    }
+
+    .contact-panel p,
+    .about-panel p {
+      margin: 0 0 16px;
+      color: #315989;
+      line-height: 1.58;
+    }
+
+    .about-panel {
+      background: linear-gradient(135deg, #07345c, #0b5b96);
+      color: #ffffff;
+    }
+
+    .about-panel h2,
+    .about-panel p {
+      color: #ffffff;
+    }
+
+    .signature {
+      margin-top: 16px;
+      text-align: right;
+      font-family: "Brush Script MT", "Segoe Script", cursive;
+      font-size: 30px;
+      color: #ffffff;
+    }
+
+    .fine-print {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .listings-shell .card {
+      margin-bottom: 0;
+    }
+
     @media (max-width: 640px) {
       .container {
         padding: 14px 12px 40px;
@@ -480,136 +902,346 @@
         width: 100%;
       }
     }
+
+    @media (max-width: 960px) {
+      .header-inner {
+        padding: 14px 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .main-nav {
+        justify-content: flex-start;
+      }
+
+      .hero-grid,
+      .contact-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-grid {
+        min-height: auto;
+        padding: 42px 0;
+      }
+
+      .hero-v2::after {
+        inset: 46% 0 0 0;
+        clip-path: none;
+      }
+
+      .stats-band .section-inner,
+      .services-grid,
+      .steps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 0 0 40px;
+      }
+
+      .section-inner,
+      .header-inner {
+        width: min(100% - 24px, 1160px);
+      }
+
+      .site-brand img {
+        width: 148px;
+      }
+
+      .main-nav {
+        gap: 10px;
+      }
+
+      .main-nav a {
+        font-size: 13px;
+      }
+
+      .nav-cta,
+      .nav-admin,
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+      }
+
+      .hero-copy h1 {
+        font-size: 36px;
+      }
+
+      .hero-copy p {
+        font-size: 17px;
+      }
+
+      .trust-grid,
+      .stats-band .section-inner,
+      .services-grid,
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-item {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 16px 0;
+      }
+
+      .stat-item:last-child {
+        border-bottom: 0;
+      }
+
+      .steps-panel {
+        padding: 22px 18px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="topbar">
-      <a href="index.html" class="brand" aria-label="Mercato Imprese">
-        <img src="logo.png" alt="" class="brand-logo" />
-        <span class="brand-title">
-          <strong>Mercato Imprese</strong>
-          <span>Compravendita aziende</span>
-        </span>
-      </a>
-      <a href="admin.html" class="admin-link">Area riservata</a>
-    </div>
-
-    <section class="hero">
-      <h1>Aziende in vendita, attività cedesi e opportunità di acquisizione</h1>
-      <p>
-        Mercato Imprese presenta annunci per chi vuole comprare un'azienda,
-        vendere un'attività commerciale o valutare opportunità di acquisizione
-        in Italia.
-      </p>
-    </section>
-
-    <section class="seo-grid" aria-label="Servizi Mercato Imprese">
-      <article class="seo-item">
-        <h2>Aziende in vendita</h2>
-        <p>
-          Consulta annunci di aziende, società e attività commerciali disponibili
-          per cessione o subentro.
-        </p>
-        <a href="aziende-in-vendita.html">Approfondisci</a>
-      </article>
-      <article class="seo-item">
-        <h2>Aziende da rilevare</h2>
-        <p>
-          Trova imprese, attività e aziende da rilevare per avviare o ampliare
-          un progetto imprenditoriale.
-        </p>
-        <a href="aziende-da-rilevare.html">Approfondisci</a>
-      </article>
-      <article class="seo-item">
-        <h2>Ditte in vendita</h2>
-        <p>
-          Consulta opportunità per comprare ditte, attività commerciali e
-          piccole imprese in Italia.
-        </p>
-        <a href="ditte-in-vendita.html">Approfondisci</a>
-      </article>
-    </section>
-
-    <section class="search-links card" aria-label="Ricerche utili">
-      <h2>Ricerche frequenti</h2>
-      <nav>
-        <a href="aziende-in-vendita.html">Aziende in vendita</a>
-        <a href="aziende-da-rilevare.html">Aziende da rilevare</a>
-        <a href="ditte-in-vendita.html">Ditte in vendita</a>
-        <a href="attivita-commerciali-in-vendita.html">Attività commerciali in vendita</a>
-        <a href="cessione-attivita-commerciale.html">Cessione attività commerciale</a>
-        <a href="comprare-azienda.html">Comprare azienda</a>
-      </nav>
-    </section>
-
-    <section class="contact-card card" aria-label="Contatti Mercato Imprese">
-      <h2>Valutazione e pubblicazione gratuita</h2>
-      <p>
-        Per proporre un'azienda, una ditta o un'attività commerciale in vendita,
-        la valutazione preliminare e la pubblicazione dell'annuncio sono gratuite
-        previo contatto via email, telefono o WhatsApp.
-      </p>
-      <div class="contact-list">
-        <a href="mailto:mercatoimprese@gmail.com">mercatoimprese@gmail.com</a>
-        <a href="tel:+393207421395">+39 320 742 1395</a>
-        <a href="https://wa.me/393207421395">WhatsApp</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="index.html" class="site-brand" aria-label="Mercato Imprese">
+          <img src="logo.png" alt="Mercato Imprese di Antonello Cassiani" />
+        </a>
+        <nav class="main-nav" aria-label="Navigazione principale">
+          <a href="aziende-in-vendita.html">Aziende in vendita</a>
+          <a href="aziende-da-rilevare.html">Aziende da rilevare</a>
+          <a href="attivita-commerciali-in-vendita.html">Attività commerciali</a>
+          <a href="#come-funziona">Come funziona</a>
+          <a href="#chi-sono">Chi sono</a>
+          <a href="#contatti" class="nav-cta">Contattami</a>
+          <a href="admin.html" class="nav-admin">Area riservata</a>
+        </nav>
       </div>
-      <p>
-        Riferimento professionale: Cassiani dr. Antonello, dottore commercialista,
-        C.so Vittorio Emanuele II 59, 65121 Pescara (PE). La sede è a Pescara,
-        ma le segnalazioni possono riguardare imprese e attività anche fuori regione.
-      </p>
-    </section>
+    </header>
+
+    <main>
+      <section class="hero-v2">
+        <div class="section-inner hero-grid">
+          <div class="hero-copy">
+            <h1>Aziende in vendita, attività cedesi e opportunità di acquisizione</h1>
+            <p>
+              La piattaforma specializzata per chi vuole vendere la propria
+              azienda o attività commerciale in Italia.
+            </p>
+
+            <div class="trust-grid" aria-label="Punti di forza">
+              <div class="trust-item">
+                <span class="trust-mark">01</span>
+                <strong>Massima riservatezza</strong>
+                <span>Trattiamo ogni incarico con la massima discrezione.</span>
+              </div>
+              <div class="trust-item">
+                <span class="trust-mark">02</span>
+                <strong>Assistenza completa</strong>
+                <span>Ti affianco in ogni fase della trattativa.</span>
+              </div>
+              <div class="trust-item">
+                <span class="trust-mark">03</span>
+                <strong>Clienti qualificati</strong>
+                <span>Metto in contatto venditori e acquirenti interessati.</span>
+              </div>
+            </div>
+
+            <div class="hero-actions">
+              <a href="#contatti" class="btn-primary">Pubblica la tua azienda</a>
+              <a href="#come-funziona" class="btn-secondary">Scopri come funziona</a>
+            </div>
+          </div>
+
+          <aside class="hero-note" aria-label="Presentazione professionale">
+            <div class="quote">“</div>
+            <p>
+              Da oltre 30 anni affianco imprese e imprenditori con competenza,
+              esperienza e passione.
+            </p>
+            <strong>Dott. Antonello Cassiani</strong>
+            <span>Dottore Commercialista - Esperto in operazioni straordinarie</span>
+          </aside>
+        </div>
+      </section>
+
+      <section class="stats-band" aria-label="Dati di sintesi">
+        <div class="section-inner">
+          <div class="stat-item">
+            <strong>30+</strong>
+            <span>Anni di esperienza</span>
+          </div>
+          <div class="stat-item">
+            <strong>500+</strong>
+            <span>Aziende valutate</span>
+          </div>
+          <div class="stat-item">
+            <strong>Assistenza</strong>
+            <span>Completa, dalla valutazione al closing</span>
+          </div>
+          <div class="stat-item">
+            <strong>Riservatezza</strong>
+            <span>Massima discrezione</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="services-section" aria-label="Servizi principali">
+        <div class="section-inner">
+          <h2 class="section-title">Cosa posso fare per te</h2>
+          <div class="services-grid">
+            <article class="service-card">
+              <span class="service-mark">MI</span>
+              <h2>Aziende in vendita</h2>
+              <p>
+                Consulta gli annunci di aziende, società e attività commerciali
+                disponibili per cessione o subentro.
+              </p>
+              <a href="aziende-in-vendita.html">Scopri le opportunità</a>
+            </article>
+            <article class="service-card">
+              <span class="service-mark">AR</span>
+              <h2>Aziende da rilevare</h2>
+              <p>
+                Trova imprese, attività e aziende da rilevare per avviare o
+                ampliare un progetto imprenditoriale.
+              </p>
+              <a href="aziende-da-rilevare.html">Scopri le opportunità</a>
+            </article>
+            <article class="service-card">
+              <span class="service-mark">AC</span>
+              <h2>Ditte e attività in vendita</h2>
+              <p>
+                Consulta opportunità per comprare ditte individuali, attività
+                commerciali e piccole imprese in Italia.
+              </p>
+              <a href="ditte-in-vendita.html">Scopri le opportunità</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="steps-section" id="come-funziona">
+        <div class="section-inner">
+          <div class="steps-panel">
+            <h2>Come funziona</h2>
+            <div class="steps-grid">
+              <article class="step-card">
+                <span class="step-mark">1</span>
+                <h3>Contatto iniziale</h3>
+                <p>Mi contatti in modo riservato via email, telefono o WhatsApp.</p>
+              </article>
+              <article class="step-card">
+                <span class="step-mark">2</span>
+                <h3>Valutazione e analisi</h3>
+                <p>Analizziamo insieme la tua azienda o attività per determinarne il valore.</p>
+              </article>
+              <article class="step-card">
+                <span class="step-mark">3</span>
+                <h3>Pubblicazione mirata</h3>
+                <p>Pubblico l'annuncio in vetrina e lo propongo alla rete di clienti qualificati.</p>
+              </article>
+              <article class="step-card">
+                <span class="step-mark">4</span>
+                <h3>Trattativa e assistenza</h3>
+                <p>Ti affianco fino alla conclusione dell'accordo con assistenza contabile e fiscale.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact-section" id="contatti">
+        <div class="section-inner contact-layout">
+          <div class="contact-panel">
+            <h2>Valutazione e pubblicazione gratuita</h2>
+            <p>
+              La valutazione preliminare e la pubblicazione dell'annuncio sono
+              gratuite e senza impegno, previo contatto via email, telefono o
+              WhatsApp.
+            </p>
+            <div class="contact-list">
+              <a href="mailto:mercatoimprese@gmail.com">mercatoimprese@gmail.com</a>
+              <a href="tel:+393207421395">+39 320 742 1395</a>
+              <a href="https://wa.me/393207421395">WhatsApp</a>
+            </div>
+            <p>
+              Oppure compila il modulo di contatto nell'area riservata e ti
+              ricontatterò al più presto.
+            </p>
+          </div>
+
+          <aside class="about-panel" id="chi-sono">
+            <h2>Chi sono</h2>
+            <p>
+              Sono Antonello Cassiani, Dottore Commercialista iscritto
+              all'Ordine di Pescara. Da oltre 30 anni assisto imprese e
+              imprenditori in operazioni straordinarie, cessioni d'azienda,
+              valutazioni e consulenza contabile e fiscale.
+            </p>
+            <div class="signature">Antonello Cassiani</div>
+          </aside>
+        </div>
+        <div class="section-inner fine-print">
+          Riferimento professionale: Cassiani dr. Antonello, dottore commercialista.
+          C.so Vittorio Emanuele II 59, 65121 Pescara (PE). La sede è a Pescara,
+          ma l'attività può riguardare imprese anche fuori regione.
+        </div>
+      </section>
+    </main>
 
     <!-- LOGIN AREA RISERVATA -->
-    <div class="card" id="admin-login" hidden>
-      <h2>Area riservata</h2>
-      <form id="login-form">
-        <label for="admin-password">Password</label>
-        <input type="password" id="admin-password" autocomplete="current-password" required />
-        <button type="submit">Accedi</button>
-        <div id="login-messaggi"></div>
-      </form>
+    <div class="section-inner">
+      <div class="card" id="admin-login" hidden>
+        <h2>Area riservata</h2>
+        <form id="login-form">
+          <label for="admin-password">Password</label>
+          <input type="password" id="admin-password" autocomplete="current-password" required />
+          <button type="submit">Accedi</button>
+          <div id="login-messaggi"></div>
+        </form>
+      </div>
     </div>
 
     <!-- FORM NUOVA AZIENDA -->
-    <div class="card" id="admin-panel" hidden>
-      <h2>Nuova azienda</h2>
-      <form id="azienda-form">
-        <label for="nome">Nome azienda</label>
-        <input type="text" id="nome" name="nome" required />
+    <div class="section-inner">
+      <div class="card" id="admin-panel" hidden>
+        <h2>Nuova azienda</h2>
+        <form id="azienda-form">
+          <label for="nome">Nome azienda</label>
+          <input type="text" id="nome" name="nome" required />
 
-        <label for="prezzo">Prezzo</label>
-        <input type="number" id="prezzo" name="prezzo" step="0.01" min="0" required />
+          <label for="prezzo">Prezzo</label>
+          <input type="number" id="prezzo" name="prezzo" step="0.01" min="0" required />
 
-        <label for="file">Foto o PDF</label>
-        <input
-          type="file"
-          id="file"
-          name="file"
-          accept="image/*,application/pdf"
-          multiple
-        />
+          <label for="file">Foto o PDF</label>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            accept="image/*,application/pdf"
+            multiple
+          />
 
-        <div class="button-row">
-          <button type="submit">Salva azienda</button>
-          <button type="button" id="svuota-locale" class="secondary">
-            Svuota archivio locale
-          </button>
-          <button type="button" id="admin-logout" class="secondary">
-            Esci
-          </button>
-        </div>
-        <div id="form-messaggi"></div>
-      </form>
+          <div class="button-row">
+            <button type="submit">Salva azienda</button>
+            <button type="button" id="svuota-locale" class="secondary">
+              Svuota archivio locale
+            </button>
+            <button type="button" id="admin-logout" class="secondary">
+              Esci
+            </button>
+          </div>
+          <div id="form-messaggi"></div>
+        </form>
+      </div>
     </div>
 
     <!-- LISTA AZIENDE -->
-    <div class="card">
-      <h2>Annunci aziende in vendita</h2>
-      <div id="lista-aziende" class="muted">Caricamento in corso...</div>
-    </div>
+    <section class="listings-shell" id="annunci">
+      <div class="section-inner">
+        <div class="card">
+          <h2>Annunci aziende in vendita</h2>
+          <div id="lista-aziende" class="muted">Caricamento in corso...</div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
