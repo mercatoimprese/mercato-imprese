@@ -6,19 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="Mercato Imprese raccoglie annunci di aziende in vendita, attivita commerciali cedesi e opportunita di acquisizione per imprenditori e investitori."
+    content="Mercato Imprese raccoglie annunci di aziende in vendita, attività commerciali cedesi e opportunità di acquisizione per imprenditori e investitori."
   />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Mercato Imprese" />
   <meta
     name="keywords"
-    content="aziende in vendita, vendita aziende, aziende cedesi, cessione attivita, acquisizione aziende, compravendita aziende, attivita commerciali in vendita"
+    content="aziende in vendita, vendita aziende, aziende cedesi, cessione attività, acquisizione aziende, compravendita aziende, attività commerciali in vendita"
   />
   <link rel="canonical" href="https://mercatoimprese.it/" />
   <meta property="og:title" content="Aziende in vendita | Mercato Imprese" />
   <meta
     property="og:description"
-    content="Annunci e opportunita per comprare, vendere o acquisire aziende e attivita commerciali."
+    content="Annunci e opportunità per comprare, vendere o acquisire aziende e attività commerciali."
   />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://mercatoimprese.it/" />
@@ -30,7 +30,7 @@
       "@type": "WebSite",
       "name": "Mercato Imprese",
       "url": "https://mercatoimprese.it/",
-      "description": "Annunci di aziende in vendita, cessione attivita e opportunita di acquisizione.",
+      "description": "Annunci di aziende in vendita, cessione attività e opportunità di acquisizione.",
       "inLanguage": "it-IT",
       "publisher": {
         "@type": "Organization",
@@ -40,7 +40,7 @@
       "about": [
         "aziende in vendita",
         "vendita aziende",
-        "cessione attivita",
+        "cessione attività",
         "compravendita aziende",
         "acquisizione aziende"
       ]
@@ -399,6 +399,36 @@
       text-decoration: none;
     }
 
+    .contact-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .contact-card h2 {
+      margin-bottom: 0;
+      color: var(--blue-strong);
+    }
+
+    .contact-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .contact-list a {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      text-decoration: none;
+    }
+
     @media (max-width: 640px) {
       .container {
         padding: 14px 12px 40px;
@@ -466,10 +496,10 @@
     </div>
 
     <section class="hero">
-      <h1>Aziende in vendita, attivita cedesi e opportunita di acquisizione</h1>
+      <h1>Aziende in vendita, attività cedesi e opportunità di acquisizione</h1>
       <p>
         Mercato Imprese presenta annunci per chi vuole comprare un'azienda,
-        vendere un'attivita commerciale o valutare opportunita di acquisizione
+        vendere un'attività commerciale o valutare opportunità di acquisizione
         in Italia.
       </p>
     </section>
@@ -478,7 +508,7 @@
       <article class="seo-item">
         <h2>Aziende in vendita</h2>
         <p>
-          Consulta annunci di aziende, societa e attivita commerciali disponibili
+          Consulta annunci di aziende, società e attività commerciali disponibili
           per cessione o subentro.
         </p>
         <a href="aziende-in-vendita.html">Approfondisci</a>
@@ -486,7 +516,7 @@
       <article class="seo-item">
         <h2>Aziende da rilevare</h2>
         <p>
-          Trova imprese, attivita e aziende da rilevare per avviare o ampliare
+          Trova imprese, attività e aziende da rilevare per avviare o ampliare
           un progetto imprenditoriale.
         </p>
         <a href="aziende-da-rilevare.html">Approfondisci</a>
@@ -494,7 +524,7 @@
       <article class="seo-item">
         <h2>Ditte in vendita</h2>
         <p>
-          Consulta opportunita per comprare ditte, attivita commerciali e
+          Consulta opportunità per comprare ditte, attività commerciali e
           piccole imprese in Italia.
         </p>
         <a href="ditte-in-vendita.html">Approfondisci</a>
@@ -507,10 +537,29 @@
         <a href="aziende-in-vendita.html">Aziende in vendita</a>
         <a href="aziende-da-rilevare.html">Aziende da rilevare</a>
         <a href="ditte-in-vendita.html">Ditte in vendita</a>
-        <a href="attivita-commerciali-in-vendita.html">Attivita commerciali in vendita</a>
-        <a href="cessione-attivita-commerciale.html">Cessione attivita commerciale</a>
+        <a href="attivita-commerciali-in-vendita.html">Attività commerciali in vendita</a>
+        <a href="cessione-attivita-commerciale.html">Cessione attività commerciale</a>
         <a href="comprare-azienda.html">Comprare azienda</a>
       </nav>
+    </section>
+
+    <section class="contact-card card" aria-label="Contatti Mercato Imprese">
+      <h2>Valutazione e pubblicazione gratuita</h2>
+      <p>
+        Per proporre un'azienda, una ditta o un'attività commerciale in vendita,
+        la valutazione preliminare e la pubblicazione dell'annuncio sono gratuite
+        previo contatto via email, telefono o WhatsApp.
+      </p>
+      <div class="contact-list">
+        <a href="mailto:mercatoimprese@gmail.com">mercatoimprese@gmail.com</a>
+        <a href="tel:+393207421395">+39 320 742 1395</a>
+        <a href="https://wa.me/393207421395">WhatsApp</a>
+      </div>
+      <p>
+        Riferimento professionale: Cassiani dr. Antonello, dottore commercialista,
+        C.so Vittorio Emanuele II 59, 65121 Pescara (PE). La sede è a Pescara,
+        ma le segnalazioni possono riguardare imprese e attività anche fuori regione.
+      </p>
     </section>
 
     <!-- LOGIN AREA RISERVATA -->
@@ -1231,7 +1280,7 @@
 
     svuotaLocaleButton.addEventListener("click", () => {
       if (!aziendeLocali.length) {
-        formMessaggi.textContent = "L'archivio locale e' gia' vuoto.";
+        formMessaggi.textContent = "L'archivio locale e' già' vuoto.";
         formMessaggi.className = "success";
         return;
       }
